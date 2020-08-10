@@ -6,6 +6,7 @@ BUILDREDHAND="1"
 REDHANDSTABLE="0"
 USEPACKAGE="0"
 BUILDVIDEO="1"
+INSTALLDEPS="0"
 
 #parse parameter
 pars=$#
@@ -23,6 +24,10 @@ do
       ;;
     "--ci")
       CI="1"
+      shift
+      ;;
+    "--init")
+      INSTALLDEPS="1"
       shift
       ;;
     "--redhand-package")
@@ -45,7 +50,8 @@ do
       echo "Usage: scripts/build.sh [options]"
       echo "Options:"
       echo "    --help              Display this information"
-      echo "    --ci                To run in CI mode to disable git-lfs pull."
+      echo "    --ci                Run in CI mode"
+      echo "    --init              Install all of the dependencies"
       echo "    --redhand-package   (Ubuntu 20.04 or newer only) Build redhand from package instead of using the source."
       echo "    --redhand-stable    (Ubuntu 20.04 or newer only) Use the redhand-dev package from the stable repository."
       echo "    --redhand-latest    (Ubuntu 20.04 or newer only) Use the redhand-dev package from the latest repository. (default)"
@@ -227,8 +233,11 @@ then
     
     cd "dependencies/redhand"
     
-    echo "installing redhand dependencies"
-    bash ./scripts/dependencies.sh
+    if [ "$INSTALLDEPS" == "1" ]
+    then
+        echo "installing redhand dependencies"
+        bash ./scripts/dependencies.sh
+    fi
     
     echo "setting redhand up"
     bash ./scripts/setup.sh --no-testgame --system-glad
