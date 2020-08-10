@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 
 THREADS="3"
 CI="0"
