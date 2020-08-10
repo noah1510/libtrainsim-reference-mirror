@@ -1,0 +1,9 @@
+image: gcc:latest
+
+build:
+  stage: build
+  before_script:
+     - ./scripts/setup.sh --init --ci 
+  script:
+    - ./scripts/build.sh
+
