@@ -7,6 +7,8 @@ REDHANDSTABLE="0"
 USEPACKAGE="0"
 BUILDVIDEO="1"
 INSTALLDEPS="0"
+REDHAND_BUILD_OPTIONS=""
+REDHAND_SETUP_OPTIONS=""
 
 #parse parameter
 pars=$#
@@ -18,6 +20,24 @@ do
       if [ $1 ]
       then
         THREADS="$(($1+1))"
+      fi
+      shift
+      i+=1
+      ;;
+    "--redhand-build-options")
+      shift
+      if [ $1 ]
+      then
+        REDHAND_BUILD_OPTIONS+="$1"
+      fi
+      shift
+      i+=1
+      ;;
+    "--redhand-setup-options")
+      shift
+      if [ $1 ]
+      then
+        REDHAND_SETUP_OPTIONS+="$1"
       fi
       shift
       i+=1
@@ -49,15 +69,17 @@ do
     "--help")
       echo "Usage: scripts/build.sh [options]"
       echo "Options:"
-      echo "    --help              Display this information"
-      echo "    --ci                Run in CI mode"
-      echo "    --init              Install all of the dependencies"
-      echo "    --redhand-package   (Ubuntu 20.04 or newer only) Build redhand from package instead of using the source."
-      echo "    --redhand-stable    (Ubuntu 20.04 or newer only) Use the redhand-dev package from the stable repository."
-      echo "    --redhand-latest    (Ubuntu 20.04 or newer only) Use the redhand-dev package from the latest repository. (default)"
-      echo "    -j [threadnumber]   Build the project with the specified number of threads."
+      echo "    --help                              Display this information"
+      echo "    --ci                                Run in CI mode"
+      echo "    --init                              Install all of the dependencies"
+      echo "    --redhand-package                   (Ubuntu 20.04 or newer only) Build redhand from package instead of using the source."
+      echo "    --redhand-stable                    (Ubuntu 20.04 or newer only) Use the redhand-dev package from the stable repository."
+      echo "    --redhand-latest                    (Ubuntu 20.04 or newer only) Use the redhand-dev package from the latest repository. (default)"
+      echo "    -j [threadnumber]                   Build the project with the specified number of threads."
+      echo "    --redhand-build-options [options]   Build the redhand with the specified options."
+      echo "    --redhand-setup-options [options]   Setup the redhand with the specified options."
       echo ""
-      echo "view the source on https://github.com/noah1510/redhand"
+      echo "view the source on https://git.thm.de/bahn-simulator/simulator"
       exit 1
       ;;
     *)
@@ -240,10 +262,20 @@ then
     fi
     
     echo "setting redhand up"
-    bash ./scripts/setup.sh --no-testgame --system-glad
+    if [ $REDHAND_SETUP_OPTIONS ]
+    then
+        bash ./scripts/setup.sh --no-testgame --system-glad $REDHAND_SETUP_OPTIONS
+    else
+        bash ./scripts/setup.sh --no-testgame --system-glad
+    fi
     
     echo "building redhand"
-    bash ./scripts/build.sh
+    if [ $REDHAND_BUILD_OPTIONS ]
+    then
+        bash ./scripts/build.sh $REDHAND_BUILD_OPTIONS
+    else
+        bash ./scripts/build.sh
+    fi
     
     cd ../..
     

@@ -3,7 +3,7 @@ image: gcc:latest
 build:
   stage: build
   before_script:
-     - ./scripts/setup.sh --init --ci 
+     - ./scripts/setup.sh --init --ci --redhand-build-options "--ci" --redhand-setup-options "--ci"
   script:
     - ./scripts/build.sh
 
