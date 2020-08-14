@@ -107,7 +107,7 @@ find_redhand_package(){
             
         if [ "$supported" == "1" ]
         then
-            if [ -n "$(sudo apt-get install libredhand-dev | grep -c "Unable to locate package libredhand-dev")" ]
+            if [ -n "$(sudo apt-get install libredhand-dev 2>&1 >/dev/null | grep -c "Unable to locate package libredhand-dev")" ]
             then
                 if [ "$USEPACKAGE" == "1" ]
                 then
@@ -264,9 +264,9 @@ then
     echo "setting redhand up"
     if [ $REDHAND_SETUP_OPTIONS ]
     then
-        bash ./scripts/setup.sh --no-testgame --system-glad $REDHAND_SETUP_OPTIONS
+        bash ./scripts/setup.sh --no-testgame $REDHAND_SETUP_OPTIONS
     else
-        bash ./scripts/setup.sh --no-testgame --system-glad
+        bash ./scripts/setup.sh --no-testgame
     fi
     
     echo "building redhand"
