@@ -26,3 +26,28 @@ To see all the options the scripts have just use the `--help` option, which exis
 ## windows
 
 Windows is not actively tested but everything should compile under windows if you use msys2 as terminal.
+
+## development environment
+
+The used IDE is visual studio code or rather [vs codium](https://vscodium.com/).
+
+The following plugins are used for the configurations to work properly:
+
+Documentaion generation and linting
+
+* bbenoist.doxygen
+* cschlosser.doxdocgen
+* davidanson.vscode-markdownlint
+
+Code formatting and linting:
+
+* notskm.clang-tidy
+* llvm-vs-code-extensions.vscode-clangd
+
+Execution and setup:
+
+* vadimcn.vscode-lldb
+* webfreak.debug
+* asabil.meson
+
+At the moment the configuration is only tested on Linux (kubuntu 20.10 amd64) however it is written in a way that should work for all platforms (except OSX where I don't know how to configure it, should be possible to make work).
