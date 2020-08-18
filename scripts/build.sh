@@ -30,7 +30,5 @@ THREADS="$(($THREADS+1))"
 find_compiler
 
 rm -rf build
-mkdir build
-cd build
-cmake -G "Ninja" -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE ..
-ninja -j"$THREADS"
+meson setup build
+meson compile -C build

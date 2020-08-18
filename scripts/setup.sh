@@ -230,7 +230,7 @@ fi
 if [ "BUILDVIDEO" == "1" ]
 then
     echo "cloning video engine"
-    git submodule update --init --recursive dependencies/video-engine
+    git submodule update --init --recursive subprojects/video-engine
     if [ $? -eq 0 ]
     then
         echo "Successfully initiated video engine"
@@ -243,7 +243,7 @@ fi
 if [ "$BUILDREDHAND" == "1" ]
 then
     echo "cloning the redhand repository"
-    git submodule update --init dependencies/redhand
+    git submodule update --init subprojects/redhand
     if [ $? -eq 0 ]
     then
         echo "Successfully initiated redhand"
@@ -253,7 +253,7 @@ then
     fi
     
     
-    cd "dependencies/redhand"
+    cd "subprojects/redhand"
     
     if [ "$INSTALLDEPS" == "1" ]
     then
@@ -261,28 +261,8 @@ then
         bash ./scripts/dependencies.sh
     fi
     
-    echo "setting redhand up"
-    if [ $REDHAND_SETUP_OPTIONS ]
-    then
-        bash ./scripts/setup.sh --no-testgame $REDHAND_SETUP_OPTIONS
-    else
-        bash ./scripts/setup.sh --no-testgame
-    fi
-    
-    echo "building redhand"
-    if [ $REDHAND_BUILD_OPTIONS ]
-    then
-        bash ./scripts/build.sh $REDHAND_BUILD_OPTIONS
-    else
-        bash ./scripts/build.sh
-    fi
-    
     cd ../..
     
-    echo "copying headers and redhand library"
-    mkdir -p lib
-    cp dependencies/redhand/deploy/$REDHANDLIB lib/
-    cp -r -u dependencies/redhand/include/redhand include/redhand
 fi
 
 exit 0
