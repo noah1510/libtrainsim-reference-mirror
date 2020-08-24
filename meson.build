@@ -8,7 +8,11 @@ project(
     ]
 )
 
-redhand_dep = dependency('redhand', required : true, fallback : ['redhand', 'redhand_dep'])
+deps = [
+    dependency('redhand', required : true, fallback : ['redhand', 'redhand_dep']),
+    dependency('libtrainsim-video', required: true, fallback: 'libtrainsim'),
+    dependency('libtrainsim-control', required: true, fallback: 'libtrainsim'),
+]
 
 incdir = include_directories('include')
 
@@ -21,5 +25,5 @@ executable(
     'simulator', 
     sources,
     include_directories : incdir,
-    dependencies: redhand_dep
+    dependencies: deps
 )

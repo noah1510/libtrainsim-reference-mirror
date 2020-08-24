@@ -1,0 +1,6 @@
+[wrap-git]
+url = https://git.thm.de/bahn-simulator/libtrainsim.git
+revision = main
+
+[provides]
+dependency_names = ['trainsim-video','trainsim-control']

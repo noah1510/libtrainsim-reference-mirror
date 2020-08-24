@@ -29,6 +29,5 @@ THREADS="$(($THREADS+1))"
 
 find_compiler
 
-rm -rf build
 meson setup build
 meson compile -C build

@@ -1,9 +1,3 @@
 [submodule "data"]
 	path = data
 	url = https://git.thm.de/bahn-simulator/simulator-data.git
-[submodule "dependencies/video-engine"]
-	path = subprojects/video-engine
-	url = https://git.thm.de/bahn-simulator/video-engine.git
-[submodule "dependencies/redhand"]
-	path = subprojects/redhand
-	url = git@github.com:noah1510/redhand.git
