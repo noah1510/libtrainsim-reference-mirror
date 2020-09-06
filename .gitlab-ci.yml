@@ -9,6 +9,7 @@ build:
     - apt-get install --yes python3-pip libglfw3-dev libvips-dev libopenal-dev libavformat-dev libavcodec-dev libavutil-dev libavfilter-dev libswscale-dev libswresample-dev libpostproc-dev
     - python3 -m pip install meson
     - python3 -m pip install glad
+    - git clone https://git.thm.de/bahn-simulator/libtrainsim.git subprojects/libtrainsim
     - ./scripts/setup.sh --init --ci
     - ./scripts/build.sh
 
