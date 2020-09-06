@@ -5,7 +5,8 @@ build:
   script:
     - git config --global user.name "noah.kirschmann@mnd.thm.de"
     - git config --global user.password "$K8S_SECRET_GITLAB_TOKEN"
-    - apt install python3-pip libglfw3-dev
+    - apt-get update
+    - apt-get install python3-pip libglfw3-dev
     - python3 -m pip install meson
     - ./scripts/setup.sh --init --ci
     - ./scripts/build.sh
