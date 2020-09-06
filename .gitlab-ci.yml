@@ -3,7 +3,11 @@ image: gcc:latest
 build:
   stage: build
   before_script:
+     - git config --global user.name "noah.kirschmann@mnd.thm.de"
+     - git config --global user.password "$K8S_SECRET_GITLAB_TOKEN"
      - ./scripts/setup.sh --init --ci
   script:
+    - git config --global user.name "noah.kirschmann@mnd.thm.de"
+    - git config --global user.password "$K8S_SECRET_GITLAB_TOKEN"
     - ./scripts/build.sh
 
