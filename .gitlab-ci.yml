@@ -8,10 +8,10 @@ build:
     - git config --global url."https://api@git.thm.de/".insteadOf "https://git.thm.de/"
     - git config --global url."https://ssh@git.thm.de/".insteadOf "ssh://git@git.thm.de/"
     - git config --global url."https://git@git.thm.de/".insteadOf "git@git.thm.de:"
-    - mkdir "subprojects/libtrainsim" && cd "subprojects/libtrainsim"
-    - git init
-    - git pull "https://git.thm.de/bahn-simulator/libtrainsim.git"
-    - cd ../..
+    #- mkdir "subprojects/libtrainsim" && cd "subprojects/libtrainsim"
+    #- git init
+    #- git pull "https://git.thm.de/bahn-simulator/libtrainsim.git"
+    #- cd ../..
     - apt-get update
     - apt-get install --yes python3-pip libglfw3-dev libvips-dev libopenal-dev libavformat-dev libavcodec-dev libavutil-dev libavfilter-dev libswscale-dev libswresample-dev libpostproc-dev
     - python3 -m pip install meson
