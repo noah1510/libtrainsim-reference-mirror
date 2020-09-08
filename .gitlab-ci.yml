@@ -4,7 +4,8 @@ build:
   stage: build
   script:
     - echo "https://gitlab-ci:$K8S_SECRET_GITLAB_TOKEN@git.thm.de" > login.txt
-    - git config --global credential.helper 'store [--file=login.txt]'
+    - git config --global credential.helper 'store [--file login.txt]'
+    - echo 'machine git.thm.de \nlogin gitlab-ci\npassword $K8S_SECRET_GITLAB_TOKE' > ~/.netrc
     - apt-get update
     - apt-get install --yes python3-pip libglfw3-dev libvips-dev libopenal-dev libavformat-dev libavcodec-dev libavutil-dev libavfilter-dev libswscale-dev libswresample-dev libpostproc-dev
     - python3 -m pip install meson
