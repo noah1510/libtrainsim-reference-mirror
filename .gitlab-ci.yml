@@ -3,11 +3,8 @@ image: gcc:latest
 build:
   stage: build
   script:
-    - git config --global user.name "simulator runner"
-    - git config --global user.email "noah.kirschmann@mnd.thm.de"
-    - git config --global user.password "$K8S_SECRET_GITLAB_TOKEN"
-    - echo "https://nkrs14:$K8S_SECRET_GITLAB_TOKEN@git.thm.de" > login.txt
-    - git config credential.helper 'store [--file=login.txt]'
+    - echo "https://gitlab-ci:$K8S_SECRET_GITLAB_TOKEN@git.thm.de" > login.txt
+    - git config --global credential.helper 'store [--file=login.txt]'
     - apt-get update
     - apt-get install --yes python3-pip libglfw3-dev libvips-dev libopenal-dev libavformat-dev libavcodec-dev libavutil-dev libavfilter-dev libswscale-dev libswresample-dev libpostproc-dev
     - python3 -m pip install meson
