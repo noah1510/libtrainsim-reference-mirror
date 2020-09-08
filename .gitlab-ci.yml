@@ -3,22 +3,27 @@ image: gcc:latest
 build:
   stage: build
   script:
-    - echo "https://gitlab-ci:$K8S_SECRET_GITLAB_TOKEN@git.thm.de" > login.txt
-    - git config --global credential.helper 'store [--file login.txt]'
-    - echo 'machine git.thm.de \nlogin gitlab-ci\npassword $K8S_SECRET_GITLAB_TOKEN' > ~/.netrc
     - echo 'echo $K8S_SECRET_GITLAB_TOKEN' > $HOME/.git-askpass && chmod +x $HOME/.git-askpass
     - export GIT_ASKPASS=$HOME/.git-askpass
     - git config --global url."https://api@git.thm.de/".insteadOf "https://git.thm.de/"
     - git config --global url."https://ssh@git.thm.de/".insteadOf "ssh://git@git.thm.de/"
     - git config --global url."https://git@git.thm.de/".insteadOf "git@git.thm.de:"
-    - apt-get update
-    - apt-get install --yes python3-pip libglfw3-dev libvips-dev libopenal-dev libavformat-dev libavcodec-dev libavutil-dev libavfilter-dev libswscale-dev libswresample-dev libpostproc-dev
-    - python3 -m pip install meson
-    - python3 -m pip install glad
     - mkdir "subprojects/libtrainsim" && cd "subprojects/libtrainsim"
     - git init
     - git pull "https://git.thm.de/bahn-simulator/libtrainsim.git"
     - cd ../..
+    - apt-get update
+    - apt-get install --yes python3-pip libglfw3-dev libvips-dev libopenal-dev libavformat-dev libavcodec-dev libavutil-dev libavfilter-dev libswscale-dev libswresample-dev libpostproc-dev
+    - python3 -m pip install meson
+    - python3 -m pip install glad
     - ./scripts/setup.sh --init --ci
     - ./scripts/build.sh
+  after_script:
+    - |
+      if [ -e success ]; then
+        echo success
+      else
+        echo failure
+        cat /builds/bahn-simulator/simulator/build/meson-logs/meson-log.txt
+      fi
 
