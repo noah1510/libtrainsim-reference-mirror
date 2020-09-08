@@ -14,7 +14,7 @@ build:
     #- cd ../..
     - apt-get update
     - apt-get install --yes python3-pip libglfw3-dev libvips-dev libopenal-dev libavdevice-dev libavformat-dev libavcodec-dev libavutil-dev libavfilter-dev libswscale-dev libswresample-dev libpostproc-dev
-    - python3 -m pip install meson
+    - python3 -m pip install meson ninja
     - python3 -m pip install glad
     - ./scripts/setup.sh --init --ci
     - ./scripts/build.sh
