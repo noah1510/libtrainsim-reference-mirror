@@ -8,12 +8,10 @@ build:
     - git config --global url."https://api@git.thm.de/".insteadOf "https://git.thm.de/"
     - git config --global url."https://ssh@git.thm.de/".insteadOf "ssh://git@git.thm.de/"
     - git config --global url."https://git@git.thm.de/".insteadOf "git@git.thm.de:"
-    #- mkdir "subprojects/libtrainsim" && cd "subprojects/libtrainsim"
-    #- git init
-    #- git pull "https://git.thm.de/bahn-simulator/libtrainsim.git"
-    #- cd ../..
     - apt-get update
-    - apt-get install --yes python3-pip libglfw3-dev libvips-dev libopenal-dev libglm-dev libavdevice-dev libavformat-dev libavcodec-dev libavutil-dev libavfilter-dev libswscale-dev libswresample-dev libpostproc-dev
+    - apt-get install --yes gfortran-8
+    - update-alternatives --install /usr/bin/gfortran gfortran /usr/bin/gfortran-8 1
+    - apt-get install --yes python3-pip libopencv-dev
     - python3 -m pip install meson ninja
     - python3 -m pip install glad
     - ./scripts/setup.sh --init --ci

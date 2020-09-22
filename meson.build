@@ -22,6 +22,7 @@ incdir = include_directories('include')
 
 sources = [
     'src/main.cpp',
+    'src/simulator.cpp',
 ]
 
 executable(
