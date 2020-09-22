@@ -7,7 +7,7 @@
 class simulator{
     private:
         guardedVar<unsigned int> currentFrame = guardedVar<unsigned int>(0);
-        guardedVar<bool> hasError = guardedVar<bool>(true);
+        guardedVar<bool> hasError = guardedVar<bool>(false);
 
         const std::string window_name = " bahn_simulator";
         bool updateImage();
