@@ -39,6 +39,18 @@ class guardedVar{
         T operator/(guardedVar<T>);
         T operator/(T);
 
+        T operator+=(guardedVar<T>);
+        T operator+=(T);
+
+        T operator-=(guardedVar<T>);
+        T operator-=(T);
+
+        T operator*=(guardedVar<T>);
+        T operator*=(T);
+
+        T operator/=(guardedVar<T>);
+        T operator/=(T);
+
         bool operator<(T);
         bool operator>(T);
 
@@ -161,6 +173,63 @@ T guardedVar<T>::operator/(guardedVar<T> other){
 template <typename T>
 T guardedVar<T>::operator/(T other){
     return this->get() / other;
+}
+
+
+template <typename T>
+T guardedVar<T>::operator+=(guardedVar<T> other){
+    auto tmp = this->get() + other.get();
+    this->set(tmp);
+    return this->get();
+}
+
+template <typename T>
+T guardedVar<T>::operator+=(T other){
+    auto tmp = this->get() + other;
+    this->set(tmp);
+    return this->get();
+}
+
+template <typename T>
+T guardedVar<T>::operator-=(guardedVar<T> other){
+    auto tmp = this->get() - other.get();
+    this->set(tmp);
+    return this->get();
+}
+
+template <typename T>
+T guardedVar<T>::operator-=(T other){
+    auto tmp = this->get() - other;
+    this->set(tmp);
+    return this->get();
+}
+
+template <typename T>
+T guardedVar<T>::operator*=(guardedVar<T> other){
+    auto tmp = this->get() * other.get();
+    this->set(tmp);
+    return this->get();
+}
+
+template <typename T>
+T guardedVar<T>::operator*=(T other){
+    auto tmp = this->get() * other;
+    this->set(tmp);
+    return this->get();
+}
+
+template <typename T>
+T guardedVar<T>::operator/=(guardedVar<T> other){
+    auto tmp = this->get() / other.get();
+    this->set(tmp);
+    return this->get();
+}
+
+template <typename T>
+T guardedVar<T>::operator/=(T other){
+    auto tmp = this->get() / other;
+    this->set(tmp);
+    return this->get();
 }
 
 

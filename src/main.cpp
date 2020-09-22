@@ -19,14 +19,12 @@ int main( int argc, char **argv){
     auto sim = std::make_unique<simulator>("data/hq/U6_vp9.mkv");
 
     while(!sim->hasErrored() && exitCode == 0){
-        // if esc was pressed the window should be closed
-        if (cv::waitKey(5) == 'a'){
-            sim->nextFrame();
-        }
-
-        switch (cv::waitKey(10)){
-            case('a'):
-                sim->nextFrame();
+        switch (cv::waitKey(1)){
+            case('w'):
+                sim->accelerate();
+                break;
+            case('s'):
+                sim->decellerate();
                 break;
             case(27):
                 std::cout << "Esc key is pressed by user. Stoppig the video" << std::endl;
