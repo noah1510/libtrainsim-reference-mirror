@@ -1,5 +1,3 @@
-#include "simulator/simulator_world.hpp"
-
 #include "video.hpp"
 #include "control.hpp"
 
@@ -9,41 +7,42 @@ int main( int argc, char **argv){
         return 100;
     }
 
-    //create the engine object
-    auto gameEngine = std::make_shared<redhand::engine>(argv[0]);
-
-    //get the current config of the engine
-    redhand::engine_config conf = gameEngine->getConfig();
-
-    //change the configuration and set the new config
-    conf.title = "Bahn Simulator";
-    conf.RESIZABLE = true;
-    conf.window_height = 720;
-    conf.window_width = 1280;
-    gameEngine->setConfig(conf);
-
-    //checking if libtrainsim works as correctly
-    libtrainsim::control::hello();
-    libtrainsim::video::hello();
-
-    //set the function which handles all the controls and physics computation
-    gameEngine->addGameLoopHandler(processGlobalInput, "global_input");
-
-    //initilize the game engine
-    gameEngine->init();
-
-    gameEngine->changeWorld(std::shared_ptr<redhand::complex_world>(new simulator_world()));
-
-    //set the exit flags in case something went wrong 
-    exitCode = gameEngine->getErrorCode();
-    if(exitCode < 0){
-        gameEngine->stopGame();
-    }else{        
-        //run the game
-        exitCode = gameEngine->runGame(); 
+    //load video file
+    if(!libtrainsim::video::load("data/hq/U6_vp9.mkv")){
+        std::cout << "ERROR::LIBTRAINSIM::COULD_NOT_LOAD_VIDEO" << std::endl;
+        return -30;
     }
-    
-    //return the error code if something bad happened or 0 if everything is fine
-    return abs(exitCode);
-    
+
+    //check if it was loaded by getting the FPS
+    std::cout << "the video has " << libtrainsim::video::getFPS() << "FPS" << std::endl;
+
+    //creating the window used to display stuff
+    std::string window_name = " bahn_simulator";
+    cv::namedWindow(window_name, cv::WINDOW_AUTOSIZE);
+
+    //all the displaying happens here
+    while(true){
+        //get the next frame that will be displayed
+        auto frame = libtrainsim::video::getNextFrame();
+
+        //if it is empty the end of the video was reached and the program has to quit
+        if (frame.empty()){
+            std::cerr << "got empty frame" << std::endl;
+            break;
+        }
+
+        //display the frame in the video
+        cv::imshow(window_name, frame);
+        
+        // if esc was pressed the window should be closed
+        if (cv::waitKey(10) == 27){
+            std::cout << "Esc key is pressed by user. Stoppig the video" << std::endl;
+            break;
+        }
+    }
+
+    //all windows will be closed to prevent memory leaks
+    cv::destroyAllWindows();
+
+    return exitCode;
 }

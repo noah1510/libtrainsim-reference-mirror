@@ -6,21 +6,22 @@ project(
         'c_std=c11', 
         'cpp_std=c++17'
     ],
-    version:'0.1.0',
+    version:'0.2.0',
     meson_version: '>= 0.54.0',
 )
 
+libtrainsim_version = '0.2.0'
+
 deps = [
-    dependency('redhand', required : true, fallback : ['redhand', 'redhand_dep']),
-    dependency('libtrainsim-video', required: true, fallback: 'libtrainsim'),
-    dependency('libtrainsim-control', required: true, fallback: 'libtrainsim'),
+    dependency('libtrainsim-video', required: true, fallback: 'libtrainsim', version : '>=' + libtrainsim_version),
+    dependency('libtrainsim-control', required: true, fallback: 'libtrainsim', version : '>=' + libtrainsim_version),
+    dependency('libtrainsim-core', required: true, fallback: 'libtrainsim', version : '>=' + libtrainsim_version),
 ]
 
 incdir = include_directories('include')
 
 sources = [
-    'src/main.cpp', 
-    'src/simulator_world.cpp'
+    'src/main.cpp',
 ]
 
 executable(
