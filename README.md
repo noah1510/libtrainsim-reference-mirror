@@ -4,32 +4,26 @@ This repository contains the Bahn Simulator application and uses the Video engin
 
 ## Building the code
 
-Before the code can be built, the repository has to be setup.
-
-First clone the repository using `git clone https://git.thm.de/bahn-simulator/simulator.git`.
-Then open a terminal in the simulator folder.
-After that execute `./scripts/setup.sh --init` to download the dependencies and setup the project.
-Now you can build the code by executing `./scripts/build.sh`.
-
-For a clean build you can run the setup scripts again (without the `--init`) and then call `./scripts/build.sh` again.
-
-## Using packaged libredhand
-
-If you want to the packaged version of libredhand use the `--redhand-package` option for the setup script.
-
-You can either install the latest package which will have all the new features or the stable package which might be a bit older but might contain less bugs.
-
-## Other script options
-
-To see all the options the scripts have just use the `--help` option, which exists for both the build and setup.
+Clone the repository using `git clone https://git.thm.de/bahn-simulator/simulator.git`and open that folder in vs code/codium.
+If you set up the development environment, you can simply go to the run tab and run `lldb debug` or `gdb debug`.
 
 ## windows
 
 Windows is not actively tested but everything should compile under windows if you use msys2 as terminal.
 
+## dependencies
+
+The following dependencies are needed to compile the code.
+On Windows these can be installed with [choco](https://chocolatey.org/) and on Linux you can use your package manager.
+
+* [meson](https://mesonbuild.com/) (version > 0.54.0)
+* [opencv](https://opencv.org/releases/) (version > 2.4.0)
+* some C++ compiler (Gcc or llvm/clang) (needs support for `<filesystem>` C++17 header; GCC > 9.2.0, Clang > 10.0.0)
+
 ## development environment
 
 The used IDE is visual studio code or rather [vs codium](https://vscodium.com/).
+In addition to that the dependencies have to be installed.
 
 The following plugins are used for the configurations to work properly:
 
