@@ -11,9 +11,33 @@ class guardedVar{
         guardedVar(T val);
         guardedVar() = delete;
 
+        /**
+         * @brief Use this function to safely set the value of this variable (same as using =).
+         * 
+         * @param newVal The new value this variable should have.
+         */
         void set(T newVal);
 
+        /**
+         * @brief Use this to safely retrieve the value insode of the container.
+         * 
+         * @return T The value in the container.
+         */
         T get();
+
+        void lock();
+        void lock_shared();
+
+        void unlock();
+        void unlock_shared();
+
+        /**
+         * @brief Get the value without any locking.
+         * @warning This should only be used if you manually manage the locking otherwise you will get nasty issues.
+         * 
+         * @return T The value stored in the container.
+         */
+        T get_unsafe();
 
         guardedVar<T> operator=(const T& other);
         guardedVar<T> operator=(guardedVar<T> other);
@@ -78,14 +102,23 @@ guardedVar<T>::guardedVar(T val){
 }
 
 template <typename T>
-guardedVar<T> guardedVar<T>::operator=(guardedVar<T> other){
-    set(other.get());
+void guardedVar<T>::lock(){
+    mutex_var.lock();
 }
 
 template <typename T>
-guardedVar<T> guardedVar<T>::operator=(const T& other){
-    set(other);
-    return get();
+void guardedVar<T>::lock_shared(){
+    mutex_var.lock_shared();
+}
+
+template <typename T>
+void guardedVar<T>::unlock(){
+    mutex_var.unlock();
+}
+
+template <typename T>
+void guardedVar<T>::unlock_shared(){
+    mutex_var.unlock_shared();
 }
 
 template <typename T>
@@ -95,10 +128,26 @@ T guardedVar<T>::get(){
 }
 
 template <typename T>
+T guardedVar<T>::get_unsafe(){
+    return var;
+}
+
+template <typename T>
 void guardedVar<T>::set(T newVal){
     std::scoped_lock<std::shared_mutex> lock(mutex_var);
     var = newVal;
 };
+
+template <typename T>
+guardedVar<T> guardedVar<T>::operator=(guardedVar<T> other){
+    set(other.get());
+}
+
+template <typename T>
+guardedVar<T> guardedVar<T>::operator=(const T& other){
+    set(other);
+    return get();
+}
 
 template <typename T>
 void guardedVar<T>::operator++(int){

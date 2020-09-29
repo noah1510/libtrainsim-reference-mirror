@@ -46,8 +46,8 @@ simulator::simulator(std::filesystem::path URI){
             if (lastFrame == 0 || currentFrame.get() > lastFrame){
                 if(updateImage()){hasError = true;};
                 lastFrame++;
-                std::this_thread::sleep_for(std::chrono::milliseconds(5));
             }
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
         }
     });
 
@@ -59,6 +59,8 @@ simulator::simulator(std::filesystem::path URI){
         auto lastTime = std::chrono::system_clock::now();
 
         while(!hasError){
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
 
             //save the speed in a local var to use the lock less
             auto currentSpeed = speed.get();
@@ -79,6 +81,7 @@ simulator::simulator(std::filesystem::path URI){
             if (currentSpeed < 0.5f){
                 lastTime = std::chrono::system_clock::now();
             }
+
         }
     });
 
@@ -108,7 +111,7 @@ void simulator::accelerate(){
     if(speed.get() < 60.0f){
         speed += 0.2f;
     }
-    if(speed > 0.5f){
+    if(speed > 59.9f){
         speed.set(60.0);
     }
 }
@@ -117,7 +120,7 @@ void simulator::decellerate(){
     if(speed.get() > 0.0f){
         speed += -1.0f;
     }
-    if(speed < 0.5f){
+    if(speed < 0.1f){
         speed.set(0.0f);
     }
 }

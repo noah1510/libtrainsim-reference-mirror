@@ -19,19 +19,21 @@ int main( int argc, char **argv){
     auto sim = std::make_unique<simulator>("data/hq/U6_vp9.mkv");
 
     while(!sim->hasErrored() && exitCode == 0){
-        switch (cv::waitKey(1)){
-            case('w'):
-                sim->accelerate();
-                break;
-            case('s'):
-                sim->decellerate();
-                break;
-            case(27):
-                std::cout << "Esc key is pressed by user. Stoppig the video" << std::endl;
-                exitCode = 1;
-                break;
-            default:
-                break;
+        for(unsigned int i = 0; i < 10 && exitCode == 0;i++){
+            switch (cv::waitKey(1)){
+                case('w'):
+                    sim->accelerate();
+                    break;
+                case('s'):
+                    sim->decellerate();
+                    break;
+                case(27):
+                    std::cout << "Esc key is pressed by user. Stoppig the video" << std::endl;
+                    exitCode = 1;
+                    break;
+                default:
+                    break;
+            }
         }
     };
 

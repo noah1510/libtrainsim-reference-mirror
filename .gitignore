@@ -5,3 +5,6 @@ include/redhand
 .cache
 
 subprojects/libtrainsim
+subprojects/Catch2*/
+subprojects/packagecache/
+subprojects/nlohmann_json-*/
