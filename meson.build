@@ -4,7 +4,10 @@ project(
     'cpp',
     default_options : [
         'c_std=c11', 
-        'cpp_std=c++17'
+        'cpp_std=c++17',
+        'b_lto=true',
+        'b_pgo=generate',
+        'b_coverage=true'
     ],
     version:'0.2.0',
     meson_version: '>= 0.54.0',

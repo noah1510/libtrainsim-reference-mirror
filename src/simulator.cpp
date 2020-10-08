@@ -26,7 +26,7 @@ simulator::simulator(std::filesystem::path URI){
     }
 
     //check if it was loaded by getting the FPS
-    auto fps = libtrainsim::video::getFPS();
+    auto fps = libtrainsim::video::getVideoProperty(cv::CAP_PROP_FPS);
     std::cout << "the video has " << fps << "FPS" << std::endl;
 
     //creating the window used to display stuff

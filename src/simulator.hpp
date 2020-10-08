@@ -1,3 +1,5 @@
+#pragma once
+
 #include <filesystem>
 #include <shared_mutex>
 #include "guard.hpp"
