@@ -6,6 +6,7 @@
 #include <memory>
 
 #include "simulator.hpp"
+#include "control.hpp"
 
 int main(){
     int exitCode = 0;
@@ -20,32 +21,28 @@ int main(){
         return 100;
     }
     
-    //libtrainsim::video::setBackend(cv::CAP_FFMPEG);
-    
     std::cout << "first location" << track.firstLocation() << "; last location:" << track.lastLocation() << std::endl;
     auto sim = std::make_unique<simulator>(track);
 
     while(!sim->hasErrored()){
         for(unsigned int i = 0; i < 10 && exitCode == 0;i++){
-            switch (cv::waitKey(1)){
-                case('w'):
+            switch(libtrainsim::control::getCurrentAction()){
+                case(libtrainsim::core::ACTION_ACCELERATE):
                     sim->accelerate();
                     break;
-                case('s'):
+                case(libtrainsim::core::ACTION_BREAK):
                     sim->decellerate();
                     break;
-                case(27):
+                case(libtrainsim::core::ACTION_CLOSE):
                     std::cout << "Esc key is pressed by user. Stoppig the video" << std::endl;
                     sim->end();
+                    exitCode = 1;
                     break;
                 default:
                     break;
             }
         }
     };
-
-    //all windows will be closed to prevent memory leaks
-    cv::destroyAllWindows();
 
     return 0;
 }
