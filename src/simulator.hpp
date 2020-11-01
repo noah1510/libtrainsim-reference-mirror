@@ -4,25 +4,30 @@
 #include <shared_mutex>
 #include "guard.hpp"
 #include "video.hpp"
+#include "track_configuration.hpp"
+#include "physics.hpp"
 #include <future>
 
 class simulator{
     private:
         guardedVar<unsigned int> currentFrame = guardedVar<unsigned int>(0);
-        guardedVar<bool> hasError = guardedVar<bool>(false);
-        guardedVar<float> speed = guardedVar<float>(0.0f);
+        guardedVar<bool> hasError = guardedVar<bool>(true);
+        
+        double acceleration = 0.0;
 
         const std::string window_name = " bahn_simulator";
         bool updateImage();
 
         std::future<void> graphicsLoop;
-        std::future<void> speedLoop;
+        
+        libtrainsim::core::Track track;
+        libtrainsim::physics phy;
 
     public:
-        simulator(std::filesystem::path URI);
+        simulator(const libtrainsim::core::Track& dat);
         ~simulator();
-        void nextFrame();
         bool hasErrored();
+        void end();
 
         void accelerate();
         void decellerate();

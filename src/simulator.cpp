@@ -5,6 +5,9 @@
 #include <thread>
 #include <chrono>
 #include <ratio>
+#include <sstream>
+
+using namespace libtrainsim::core;
 
 bool simulator::hasErrored(){
     return hasError.get();
@@ -13,114 +16,88 @@ bool simulator::hasErrored(){
 simulator::~simulator(){
     hasError = true;
     graphicsLoop.get();
-    speedLoop.get();
+    std::cout << std::endl;
     std::cout << "simulator has exited" << std::endl;
 }
 
-simulator::simulator(std::filesystem::path URI){
+simulator::simulator(const Track& dat):track{dat},phy{libtrainsim::physics(dat)}{
     //load video file
-    if(!libtrainsim::video::load(URI)){
-        std::cout << "ERROR::LIBTRAINSIM::COULD_NOT_LOAD_VIDEO" << std::endl;
-        hasError = true;
+    if(!dat.isValid()){
+        std::cout << "ERROR::SIMULATOR::NON_VALID_TRACK" << std::endl;
+        return;
+    }
+    
+    if(!libtrainsim::video::load(dat.getVideoFilePath())){
+        std::cout << "ERROR::SIMULATOR::COULD_NOT_LOAD_VIDEO" << std::endl;
         return;
     }
 
-    //check if it was loaded by getting the FPS
-    auto fps = libtrainsim::video::getVideoProperty(cv::CAP_PROP_FPS);
-    std::cout << "the video has " << fps << "FPS" << std::endl;
-
     //creating the window used to display stuff
-    cv::namedWindow(window_name, cv::WINDOW_NORMAL);
-
-    //Display the first frame
-    auto frame = libtrainsim::video::getNextFrame();
-    if (!frame.empty()){
-        cv::imshow(window_name, frame); 
-        currentFrame++;
-    };
+    libtrainsim::video::createWindow(window_name);
 
     graphicsLoop = std::async([&](){
-        unsigned int lastFrame = 0;
-        std::cout << "stated graphics loop" << std::endl;
+        auto lastLoop = libtrainsim::physics::now();
+        std::cout << "stated graphics loop" << std::endl; 
         while(!hasError){
-            if (lastFrame == 0 || currentFrame.get() > lastFrame){
-                if(updateImage()){hasError = true;};
-                lastFrame++;
+            auto nextTime = libtrainsim::physics::now();
+            if(nextTime-lastLoop > std::chrono::milliseconds(1)){
+                updateImage();
+                lastLoop = nextTime;
             }
-            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            std::this_thread::sleep_for(std::chrono::nanoseconds(1));
         }
     });
-
-    //This thread handles the advancing of frames based on the current speed
-    speedLoop = std::async([&](){
-        std::cout << "stated speed loop" << std::endl;
-
-        //save when the last advancement was
-        auto lastTime = std::chrono::system_clock::now();
-
-        while(!hasError){
-
-            std::this_thread::sleep_for(std::chrono::milliseconds(5));
-
-            //save the speed in a local var to use the lock less
-            auto currentSpeed = speed.get();
-            std::chrono::duration<double, std::milli> deltaT = std::chrono::system_clock::now() - lastTime;
-
-            //check if the train is moving
-            if (currentSpeed > 0.5f){
-
-                //get the time that should have passed since the last frame
-                auto frametime = std::chrono::duration(std::chrono::milliseconds(static_cast<int>(1000.0f/currentSpeed)));
-                if(deltaT.count() > frametime.count()){
-
-                    //If enough time has passed advance one frame and update the time
-                    nextFrame();
-                    lastTime = std::chrono::system_clock::now();
-                }
-            }
-            if (currentSpeed < 0.5f){
-                lastTime = std::chrono::system_clock::now();
-            }
-
-        }
-    });
-
-}
-
-void simulator::nextFrame(){
-    currentFrame++;
+    
+    hasError = false;
 }
 
 bool simulator::updateImage(){
-    //get the next frame that will be displayed
-    auto frame = libtrainsim::video::getNextFrame();
-
-    //if it is empty the end of the video was reached and the program has to quit
-    if (frame.empty()){
-        std::cerr << "got empty frame" << std::endl;
-        return true;
+    //store the last location
+    static double last_position = track.firstLocation();
+    static auto last_time = libtrainsim::physics::now();
+    static bool firstCall = true;
+    
+    phy.tick();
+    auto loc = phy.getLocation();
+    
+    //get a new frame if needed
+    if (last_position < loc || firstCall){
+        firstCall = false;
+        
+        //get the next frame that will be displayed
+        auto frame_num = track.data().getFrame(loc);
+        
+        libtrainsim::video::gotoFrame(frame_num);
+        libtrainsim::video::updateWindow();
+        
+        //update the last position
+        last_position = loc;
+    }else{
+        libtrainsim::video::refreshWindow();
     }
-
-    //display the frame in the video
-    cv::imshow(window_name, frame);
+    
+    //display statistics (speed, location, frametime, etc.) 
+    auto next_time = libtrainsim::physics::now();
+    double frametime = static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(next_time-last_time).count())/1000.0;
+    std::cout << "acceleration:" << std::setiosflags(std::ios::fixed) << std::setprecision(2) << acceleration << "m/s^2; current velocity:" << phy.getVelocity() << "m/s; current location:" << phy.getLocation() << "m / " << track.lastLocation() << "m; frametime:" << frametime << "ms; " << 1000.0 / frametime << " fps\r" << std::flush;
+    
+    last_time = next_time;
 
     return false;
 }
 
 void simulator::accelerate(){
-    if(speed.get() < 60.0f){
-        speed += 0.2f;
-    }
-    if(speed > 59.9f){
-        speed.set(60.0);
-    }
+    acceleration = track.train().clampAcceleration(acceleration + 0.1);
+    if(std::abs(acceleration) < 0.07){acceleration = 0.0;};
+    phy.setAcelleration(acceleration);
 }
 
 void simulator::decellerate(){
-    if(speed.get() > 0.0f){
-        speed += -1.0f;
-    }
-    if(speed < 0.1f){
-        speed.set(0.0f);
-    }
+    acceleration = track.train().clampAcceleration(acceleration - 0.1);
+    if(std::abs(acceleration) < 0.07){acceleration = 0.0;};
+    phy.setAcelleration(acceleration);
+}
+
+void simulator::end(){
+    hasError = true;
 }
