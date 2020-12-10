@@ -14,7 +14,7 @@ project(
     meson_version: '>= 0.54.0',
 )
 
-libtrainsim_version = '0.3.5'
+libtrainsim_version = '0.4.0'
 
 deps = [
     dependency('libtrainsim-full', required: true, fallback: 'libtrainsim', version : '>=' + libtrainsim_version),
