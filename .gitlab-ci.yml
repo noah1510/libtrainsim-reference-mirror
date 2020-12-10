@@ -14,6 +14,6 @@ build:
     - apt-get install --yes python3-pip libopencv-dev
     - python3 -m pip install meson ninja
     - python3 -m pip install glad
-    - ./scripts/setup.sh --init --ci
-    - ./scripts/build.sh
-
+    - meson setup build
+    - meson compile -C build
+    - meson test -C build
