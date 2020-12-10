@@ -1,4 +1,3 @@
-#include "opencv2/highgui.hpp"
 #include "video.hpp"
 #include "control.hpp"
 #include "track_configuration.hpp"
@@ -13,6 +12,7 @@ int main(){
 
     //check if singeltons are running
     std::cout << libtrainsim::video::hello() << std::endl;
+    libtrainsim::video::setBackend(libtrainsim::ffmpeg_sdl);
     std::cout << libtrainsim::control::hello() << std::endl;
 
     const auto track = libtrainsim::core::Track("data/production_data/Track.json");

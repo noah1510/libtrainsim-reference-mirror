@@ -68,7 +68,6 @@ bool simulator::updateImage(){
         auto frame_num = track.data().getFrame(loc);
         
         libtrainsim::video::gotoFrame(frame_num);
-        libtrainsim::video::updateWindow();
         
         //update the last position
         last_position = loc;
