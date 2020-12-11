@@ -10,7 +10,7 @@ project(
         'b_coverage=true',
         'libtrainsim:build_full=true'
     ],
-    version:'0.2.0',
+    version:'0.3.0',
     meson_version: '>= 0.54.0',
 )
 
