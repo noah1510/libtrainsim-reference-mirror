@@ -3,11 +3,6 @@ image: gcc:latest
 build:
   stage: build
   script:
-    - echo 'echo $K8S_SECRET_GITLAB_TOKEN' > $HOME/.git-askpass && chmod +x $HOME/.git-askpass
-    - export GIT_ASKPASS=$HOME/.git-askpass
-    - git config --global url."https://api@git.thm.de/".insteadOf "https://git.thm.de/"
-    - git config --global url."https://ssh@git.thm.de/".insteadOf "ssh://git@git.thm.de/"
-    - git config --global url."https://git@git.thm.de/".insteadOf "git@git.thm.de:"
     - apt-get update
     - apt-get install --yes gfortran-8
     - update-alternatives --install /usr/bin/gfortran gfortran /usr/bin/gfortran-8 1
