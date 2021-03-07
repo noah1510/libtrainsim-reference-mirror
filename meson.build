@@ -31,5 +31,9 @@ executable(
     'simulator', 
     sources,
     include_directories : incdir,
-    dependencies: deps
+    dependencies: deps,
+    install : true,
+    install_dir : get_option('datadir') / 'libtrainsim',
 )
+
+install_subdir('data', install_dir : get_option('datadir') / 'libtrainsim')
