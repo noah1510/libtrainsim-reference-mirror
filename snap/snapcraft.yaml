@@ -28,7 +28,7 @@ parts:
         meson install -C build
         rsync --links --remove-source-files -r $SNAPCRAFT_PART_INSTALL/usr/local/lib/ $SNAPCRAFT_PART_INSTALL/usr/lib
         rsync --links --remove-source-files -r $SNAPCRAFT_PART_INSTALL/usr/local/include/ $SNAPCRAFT_PART_INSTALL/usr/include
-        cp de.thm.simulator.desktop $SNAPCRAFT_PART_INSTALL/usr/local/libtrainsim/
+        cp de.thm.simulator.desktop $SNAPCRAFT_PART_INSTALL/usr/local/share/libtrainsim/
         
     override-stage: |
         snapcraftctl stage
@@ -100,7 +100,7 @@ parts:
 apps:
   libtrainsim:
     extensions: [gnome-3-38]
-    desktop: usr/share/local/libtrainsim/de.thm.simulator.desktop
+    desktop: usr/local/share/libtrainsim/de.thm.simulator.desktop
     plugs:
         - gsettings
         - home

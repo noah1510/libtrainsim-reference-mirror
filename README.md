@@ -6,6 +6,11 @@ If you want the data you need to download the subproject.
 If you simply want to test this out you can download the simulator from the snap store (linux only).
 Once downloaded you can open the simulator from your application menu.
 
+If the program crashes immediatly you have to options to get it working.
+First off you can edit the desktop launch file and try manually setting the working directory to `/snap/libtrainsim/current/usr/local/share/libtrainsim/`.
+The other solution is to open a terminal and type `cd /snap/libtrainsim/current/usr/local/share/libtrainsim/`.
+Now you can just enter `libtrainsim` into the terminal and the simulator should open.
+
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/libtrainsim)
 
 ## Building the code
