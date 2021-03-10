@@ -1,0 +1,20 @@
+[Desktop Entry]
+Comment=Trainsimulor reference implementation
+Comment[de]=Bahnsimulator starten
+Comment[en]=Start the train simulator
+Exec=libtrainsim
+GenericName=simulator
+Keywords=Simulator;Train;Driving
+MimeType=
+Name=libtrainsim
+Name[de]=libtrainsim
+Name[en]=notekit
+Path=/snap/libtrainsim/current/usr/local/share/libtrainsim/
+StartupNotify=true
+Terminal=true
+TerminalOptions=
+Type=Application
+X-DBUS-ServiceName=
+X-DBUS-StartupType=
+X-KDE-SubstituteUID=false
+X-KDE-Username=
