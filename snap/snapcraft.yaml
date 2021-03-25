@@ -6,8 +6,17 @@ description: |
   This package contains builds of the reference implementation of libtrainsim with the date for one track.
   At the moment this track is hardcoded but there will be many updates in the future.
 
-grade: devel # must be 'stable' to release into candidate/stable channels
-confinement: devmode # use 'strict' once you have the right plugs and slots
+grade: stable # must be 'stable' to release into candidate/stable channels
+confinement: strict # use 'strict' once you have the right plugs and slots
+architectures:
+  - build-on: s390x
+  - build-on: ppc64el
+  - build-on: arm64
+  - build-on: armhf
+  - build-on: amd64
+  - build-on: i386
+
+compression: lzo
 
 parts:
   libtrainsim:
