@@ -7,15 +7,20 @@
 #include "simulator.hpp"
 #include "control.hpp"
 
-int main(){
+int main(int argc, char **argv){
     int exitCode = 0;
+    
+    std::cout << "command line args:" << std::endl;
+    for (int i = 0; i < argc;i++){
+        std::cout << argv[i] << std::endl;
+    }
 
     //check if singeltons are running
     std::cout << libtrainsim::video::hello() << std::endl;
     libtrainsim::video::setBackend(libtrainsim::ffmpeg_sdl);
     std::cout << libtrainsim::control::hello() << std::endl;
 
-    const auto track = libtrainsim::core::Track("data/production_data/Track.json");
+    const auto track = libtrainsim::core::Track(argc > 1 ? argv[1] : "data/production_data/Track.json");
     if(!track.isValid()){
         std::cerr << "track data not valid" << std::endl;
         return 100;
