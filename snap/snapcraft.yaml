@@ -106,17 +106,23 @@ parts:
         - libzvbi0
         - ocl-icd-libopencl1
     
+plugs:
+  libtrainsim-data-plug:
+    interface: content
+    content: data
+    target: $SNAP
+    
 apps:
   libtrainsim:
     extensions: [gnome-3-38]
     desktop: usr/local/share/libtrainsim/de.thm.simulator.desktop
     plugs:
-        - gsettings
         - home
         - desktop
         - desktop-legacy
         - opengl
         - wayland
         - x11
+        - unity8
     command: usr/local/share/libtrainsim/simulator
     
