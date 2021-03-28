@@ -1,6 +1,6 @@
 name: libtrainsim # you probably want to 'snapcraft register <name>'
 base: core20 # the base snap is the execution environment for this snap
-version: '0.3.0' # just for humans, typically '1.2+git' or '1.3.2'
+version: '0.4.0' # just for humans, typically '1.2+git' or '1.3.2'
 summary: The reference implementaion of libtrainsim # 79 char long summary
 description: |
   This package contains builds of the reference implementation of libtrainsim with the date for one track.
@@ -14,7 +14,6 @@ architectures:
   - build-on: arm64
   - build-on: armhf
   - build-on: amd64
-  - build-on: i386
 
 compression: lzo
 
@@ -26,13 +25,11 @@ parts:
     source: https://git.thm.de/bahn-simulator/simulator.git
     override-build: |
         sudo -H python3 -m pip install meson
-        curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
-        apt-get install git-lfs
-        cd data
-        git lfs install
-        git lfs pull
-        cd ..
-        meson setup --prefix $SNAPCRAFT_PART_INSTALL/usr/local build
+        wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
+        echo "deb http://apt.llvm.org/focal/     llvm-toolchain-focal-12   main" > /etc/apt/sources.list.d/llvm.list
+        apt-get update
+        apt-get install -y clang-12 lldb-12 lld-12 clangd-12
+        CC=clang-12 CXX=clang++-12 meson setup --prefix $SNAPCRAFT_PART_INSTALL/usr/local -Dno-data=true --optimization 2 build
         meson compile -C build
         meson install -C build
         rsync --links --remove-source-files -r $SNAPCRAFT_PART_INSTALL/usr/local/lib/ $SNAPCRAFT_PART_INSTALL/usr/lib
@@ -55,6 +52,9 @@ parts:
         - curl
         - bash
         - rsync
+        - wget
+        - lsb-release
+        - software-properties-common
 
         - libsdl2-dev
         - libavcodec-dev
