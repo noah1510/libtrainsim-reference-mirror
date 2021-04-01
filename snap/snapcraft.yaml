@@ -27,11 +27,7 @@ parts:
         python3 -m pip install --upgrade pip setuptools wheel
         export PATH=$PATH:/root/.local/bin
         python3 -m pip install "meson>=0.57.0"
-        wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
-        echo "deb http://apt.llvm.org/focal/     llvm-toolchain-focal-12   main" > /etc/apt/sources.list.d/llvm.list
-        apt-get update
-        apt-get install -y clang-12 lldb-12 lld-12 clangd-12
-        CC=clang-12 CXX=clang++-12 meson setup --prefix $SNAPCRAFT_PART_INSTALL/usr/local -Dno-data=true --optimization 2 build
+        CC=clang-10 CXX=clang++-10 meson setup --prefix $SNAPCRAFT_PART_INSTALL/usr/local -Dno-data=true --optimization 2 build
         meson compile -C build
         meson install -C build
         rsync --links --remove-source-files -r $SNAPCRAFT_PART_INSTALL/usr/local/lib/ $SNAPCRAFT_PART_INSTALL/usr/lib
@@ -57,6 +53,10 @@ parts:
         - wget
         - lsb-release
         - software-properties-common
+        - clangd-10
+        - lld-10
+        - lldb-10
+        - clang-10
 
         - libsdl2-dev
         - libavcodec-dev

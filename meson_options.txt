@@ -1,4 +1,4 @@
-option('march_x86_64', type : 'string', value : 'x86-64-v2', description : 'The compiler architecture the code should be optimized for (on x86_64)(default: x86-64-v2).')
+option('march_x86_64', type : 'string', value : 'athlon-fx', description : 'The compiler architecture the code should be optimized for (on x86_64)(default: x86-64-v2).')
 option('march_arm_64', type : 'string', value : 'armv8-a', description : 'The compiler architecture the code should be optimized for (on arm 64bit)(default: armv8-a which matches the raspberry pi 4).')
 option('march_arm_32', type : 'string', value : 'armv7-a', description : 'The compiler architecture the code should be optimized for (on arm 32bit)(default: armv7-a which matches older android phones).')
 option('no-data', type: 'boolean', value: false, description: 'do not install the data folder when this is set to true')
