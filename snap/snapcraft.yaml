@@ -24,7 +24,9 @@ parts:
     source-type: git
     source: https://git.thm.de/bahn-simulator/simulator.git
     override-build: |
-        sudo -H python3 -m pip install meson
+        python3 -m pip install --upgrade pip setuptools wheel
+        export PATH=$PATH:/root/.local/bin
+        python3 -m pip install "meson>=0.57.0"
         wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
         echo "deb http://apt.llvm.org/focal/     llvm-toolchain-focal-12   main" > /etc/apt/sources.list.d/llvm.list
         apt-get update

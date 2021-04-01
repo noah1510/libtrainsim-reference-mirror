@@ -12,8 +12,9 @@ subprojects/nlohmann_json-*/
 simulator\+\+.kdev4
 libtrainsim_*_amd64.snap
 libtrainsim_*.snap.xdelta3
-libtrainsim_amd64.txt
-libtrainsim_arm64.txt
-libtrainsim_armhf.txt
-libtrainsim_i386.txt
-libtrainsim_s390x.txt
+libtrainsim_amd64*.txt
+libtrainsim_arm64*.txt
+libtrainsim_armhf*.txt
+libtrainsim_i386*.txt
+libtrainsim_s390x*.txt
+*.profraw
