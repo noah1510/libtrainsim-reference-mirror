@@ -9,10 +9,10 @@ description: |
 grade: stable # must be 'stable' to release into candidate/stable channels
 confinement: strict # use 'strict' once you have the right plugs and slots
 architectures:
-  - build-on: s390x
-  - build-on: ppc64el
+#  - build-on: s390x
+#  - build-on: ppc64el
+#  - build-on: armhf
   - build-on: arm64
-  - build-on: armhf
   - build-on: amd64
 
 compression: lzo
@@ -36,8 +36,8 @@ parts:
         
     override-stage: |
         snapcraftctl stage
-        sed -i 's|$SNAPCRAFT_STAGE/usr|/snap/libtrainsim/current/usr|g' $SNAPCRAFT_STAGE/usr/lib/x86_64-linux-gnu/pkgconfig/*.pc
-        cat $SNAPCRAFT_STAGE/usr/lib/x86_64-linux-gnu/pkgconfig/trainsim-core.pc
+        sed -i 's|$SNAPCRAFT_STAGE/usr|/snap/libtrainsim/current/usr|g' $SNAPCRAFT_STAGE/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pkgconfig/*.pc
+        cat $SNAPCRAFT_STAGE/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pkgconfig/trainsim-core.pc
         
     build-packages:
         - python3
@@ -53,7 +53,6 @@ parts:
         - wget
         - lsb-release
         - software-properties-common
-        - clangd-10
         - lld-10
         - lldb-10
         - clang-10
