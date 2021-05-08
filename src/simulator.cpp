@@ -53,7 +53,7 @@ simulator::simulator(const Track& dat):track{dat},phy{libtrainsim::physics(dat)}
 
 bool simulator::updateImage(){
     //store the last location
-    static double last_position = track.firstLocation();
+    static auto last_position = track.firstLocation();
     static auto last_time = libtrainsim::physics::now();
     static bool firstCall = true;
     
