@@ -1,14 +1,8 @@
-image: gcc:latest
+image: noasakurajin/libtrainsim-build-container:fedora
 
 build:
   stage: build
   script:
-    - apt-get update
-    - apt-get install --yes gfortran-8
-    - update-alternatives --install /usr/bin/gfortran gfortran /usr/bin/gfortran-8 1
-    - apt-get install --yes python3-pip libopencv-dev libsdl2-dev libavcodec-dev libavdevice-dev libavfilter-dev libavformat-dev libavresample-dev libavutil-dev libswresample-dev libswscale-dev libpostproc-dev
-    - python3 -m pip install meson ninja
-    - python3 -m pip install glad
     - meson setup build
     - meson compile -C build
     - meson test -C build
