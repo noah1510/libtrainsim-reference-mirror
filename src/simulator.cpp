@@ -9,6 +9,10 @@
 
 using namespace libtrainsim::core;
 
+using namespace sakurajin::unit_system;
+using namespace sakurajin::unit_system::base::literals;
+using namespace sakurajin::unit_system::common::literals;
+
 bool simulator::hasErrored(){
     return hasError.get();
 }
@@ -53,7 +57,7 @@ simulator::simulator(const Track& dat):track{dat},phy{libtrainsim::physics(dat)}
 
 bool simulator::updateImage(){
     //store the last location
-    static double last_position = track.firstLocation();
+    static auto last_position = track.firstLocation();
     static auto last_time = libtrainsim::physics::now();
     static bool firstCall = true;
     
@@ -77,8 +81,9 @@ bool simulator::updateImage(){
     
     //display statistics (speed, location, frametime, etc.) 
     auto next_time = libtrainsim::physics::now();
-    double frametime = static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(next_time-last_time).count())/1000.0;
-    std::cout << "acceleration:" << std::setiosflags(std::ios::fixed) << std::setprecision(2) << acceleration << "m/s^2; current velocity:" << phy.getVelocity() << "m/s; current location:" << phy.getLocation() << "m / " << track.lastLocation() << "m; frametime:" << frametime << "ms; " << 1000.0 / frametime << " fps\r" << std::flush;
+    
+    base::time_si frametime = unit_cast(next_time-last_time, prefix::milli);
+    std::cout << "acceleration:" << std::setiosflags(std::ios::fixed) << std::setprecision(2) << acceleration << "; current velocity:" << phy.getVelocity() << "; current location:" << phy.getLocation() << " / " << track.lastLocation() << "; frametime:" << frametime.value << "ms; \r" << std::flush;
     
     last_time = next_time;
 
@@ -86,14 +91,14 @@ bool simulator::updateImage(){
 }
 
 void simulator::accelerate(){
-    acceleration = track.train().clampAcceleration(acceleration + 0.1);
-    if(std::abs(acceleration) < 0.07){acceleration = 0.0;};
+    acceleration = track.train().clampAcceleration(acceleration + 0.1_mps2);
+    if(abs(acceleration) < 0.07_mps2){acceleration = 0.0_mps2;};
     phy.setAcelleration(acceleration);
 }
 
 void simulator::decellerate(){
-    acceleration = track.train().clampAcceleration(acceleration - 0.1);
-    if(std::abs(acceleration) < 0.07){acceleration = 0.0;};
+    acceleration = track.train().clampAcceleration(acceleration - 0.1_mps2);
+    if(abs(acceleration) < 0.07_mps2){acceleration = 0.0_mps2;};
     phy.setAcelleration(acceleration);
 }
 
