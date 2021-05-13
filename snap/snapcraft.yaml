@@ -24,7 +24,6 @@ parts:
     source-type: git
     source: https://git.thm.de/bahn-simulator/simulator.git
     override-build: |
-        python3 -m pip install --upgrade pip setuptools wheel
         export PATH=$PATH:/root/.local/bin
         python3 -m pip install "meson>=0.57.0"
         CC=clang-10 CXX=clang++-10 meson setup --prefix $SNAPCRAFT_PART_INSTALL/usr/local -Dno-data=true --optimization 2 build
