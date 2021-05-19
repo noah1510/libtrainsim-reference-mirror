@@ -17,7 +17,7 @@ int main(int argc, char **argv){
 
     //check if singeltons are running
     std::cout << libtrainsim::video::hello() << std::endl;
-    libtrainsim::video::setBackend(libtrainsim::ffmpeg_sdl);
+    libtrainsim::video::setBackend(libtrainsim::opencv);
     std::cout << libtrainsim::control::hello() << std::endl;
 
     const auto track = libtrainsim::core::Track(argc > 1 ? argv[1] : "data/production_data/Track.json");
