@@ -1,0 +1,6 @@
+[wrap-git]
+url = https://github.com/noah1510/unit-system.git
+revision = main
+
+[provides]
+dependency_names = ['unit-system-full','unit-system-generic','unit-system-base','unit-system-common']

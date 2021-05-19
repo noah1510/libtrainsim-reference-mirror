@@ -3,6 +3,7 @@
 #include "track_configuration.hpp"
 #include <future>
 #include <memory>
+#include <cassert>
 
 #include "simulator.hpp"
 #include "control.hpp"
@@ -14,6 +15,10 @@ int main(int argc, char **argv){
     for (int i = 0; i < argc;i++){
         std::cout << argv[i] << std::endl;
     }
+    
+    //check if the libtrainsim version is high enough
+    const libtrainsim::core::version required_version{0,6,0};
+    assert((libtrainsim::core::lib_version >= required_version) && "libtrainsim version not high enogh!");
 
     //check if singeltons are running
     std::cout << libtrainsim::video::hello() << std::endl;
