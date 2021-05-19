@@ -13,7 +13,7 @@ class simulator{
         guardedVar<unsigned int> currentFrame = guardedVar<unsigned int>(0);
         guardedVar<bool> hasError = guardedVar<bool>(true);
         
-        double acceleration = 0.0;
+        sakurajin::unit_system::common::acceleration acceleration;
 
         const std::string window_name = " bahn_simulator";
         bool updateImage();

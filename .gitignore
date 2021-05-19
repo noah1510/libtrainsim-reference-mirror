@@ -8,6 +8,7 @@ subprojects/libtrainsim
 subprojects/Catch2*/
 subprojects/packagecache/
 subprojects/nlohmann_json-*/
+subprojects/unit-system/
 
 simulator\+\+.kdev4
 libtrainsim_*.snap
@@ -19,3 +20,5 @@ libtrainsim_i386*.txt
 libtrainsim_s390x*.txt
 libtrainsim_ppc64el*.txt
 *.profraw
+
+*.kdev4
