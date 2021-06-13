@@ -30,7 +30,7 @@ simulator::simulator(const Track& dat):track{dat},phy{libtrainsim::physics(dat)}
         std::cout << "ERROR::SIMULATOR::NON_VALID_TRACK" << std::endl;
         return;
     }
-    
+
     if(!libtrainsim::video::load(dat.getVideoFilePath())){
         std::cout << "ERROR::SIMULATOR::COULD_NOT_LOAD_VIDEO" << std::endl;
         return;
@@ -41,7 +41,7 @@ simulator::simulator(const Track& dat):track{dat},phy{libtrainsim::physics(dat)}
 
     graphicsLoop = std::async([&](){
         auto lastLoop = libtrainsim::physics::now();
-        std::cout << "stated graphics loop" << std::endl; 
+        std::cout << "stated graphics loop" << std::endl;
         while(!hasError){
             auto nextTime = libtrainsim::physics::now();
             if(nextTime-lastLoop > std::chrono::milliseconds(1)){
@@ -51,7 +51,7 @@ simulator::simulator(const Track& dat):track{dat},phy{libtrainsim::physics(dat)}
             std::this_thread::sleep_for(std::chrono::nanoseconds(1));
         }
     });
-    
+
     hasError = false;
 }
 
@@ -60,46 +60,58 @@ bool simulator::updateImage(){
     static auto last_position = track.firstLocation();
     static auto last_time = libtrainsim::physics::now();
     static bool firstCall = true;
-    
+
     phy.tick();
     auto loc = phy.getLocation();
-    
+
     //get a new frame if needed
     if (last_position < loc || firstCall){
         firstCall = false;
-        
+
         //get the next frame that will be displayed
         auto frame_num = track.data().getFrame(loc);
-        
+
         libtrainsim::video::gotoFrame(frame_num);
-        
+
         //update the last position
         last_position = loc;
     }else{
         libtrainsim::video::refreshWindow();
     }
-    
-    //display statistics (speed, location, frametime, etc.) 
+
+    //display statistics (speed, location, frametime, etc.)
     auto next_time = libtrainsim::physics::now();
-    
+
     base::time_si frametime = unit_cast(next_time-last_time, prefix::milli);
     std::cout << "acceleration:" << std::setiosflags(std::ios::fixed) << std::setprecision(2) << acceleration << "; current velocity:" << phy.getVelocity() << "; current location:" << phy.getLocation() << " / " << track.lastLocation() << "; frametime:" << frametime.value << "ms; \r" << std::flush;
-    
+
     last_time = next_time;
 
     return false;
 }
 
 void simulator::accelerate(){
+    Speedlevel = phy.clampSpeedlevel(Speedlevel + 0.1);
+    if(abs(Speedlevel) < 0.07_mps2){Speedlevel = 0.0_mps2;};
+    phy.setSpeedlevel(Speedlevel);
+
+    /*
     acceleration = track.train().clampAcceleration(acceleration + 0.1_mps2);
     if(abs(acceleration) < 0.07_mps2){acceleration = 0.0_mps2;};
     phy.setAcelleration(acceleration);
+    */
 }
 
 void simulator::decellerate(){
+    Speedlevel = phy.clampSpeedlevel(Speedlevel - 0.1);
+    if(abs(Speedlevel) < 0.07_mps2){Speedlevel = 0.0_mps2;};
+    phy.setSpeedlevel(Speedlevel);
+
+    /*
     acceleration = track.train().clampAcceleration(acceleration - 0.1_mps2);
     if(abs(acceleration) < 0.07_mps2){acceleration = 0.0_mps2;};
     phy.setAcelleration(acceleration);
+    */
 }
 
 void simulator::end(){

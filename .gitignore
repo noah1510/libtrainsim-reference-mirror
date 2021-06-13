@@ -8,7 +8,7 @@ subprojects/libtrainsim
 subprojects/Catch2*/
 subprojects/packagecache/
 subprojects/nlohmann_json-*/
-subprojects/unit-system/
+subprojects/unit-system
 
 simulator\+\+.kdev4
 libtrainsim_*.snap
