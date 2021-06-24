@@ -23,7 +23,9 @@ int main(int argc, char **argv){
     //check if singeltons are running
     std::cout << libtrainsim::video::hello() << std::endl;
     libtrainsim::video::setBackend(libtrainsim::ffmpeg_sdl);
-    std::cout << libtrainsim::control::hello() << std::endl;
+    
+    libtrainsim::control::input_handler input{};
+    std::cout << input.hello() << std::endl;
 
     const auto track = libtrainsim::core::Track(argc > 1 ? argv[1] : "data/production_data/Track.json");
     if(!track.isValid()){
@@ -35,21 +37,22 @@ int main(int argc, char **argv){
     auto sim = std::make_unique<simulator>(track);
 
     while(!sim->hasErrored()){
-        for(unsigned int i = 0; i < 10 && exitCode == 0;i++){
-            switch(libtrainsim::control::getCurrentAction()){
-                case(libtrainsim::core::ACTION_ACCELERATE):
-                    sim->accelerate();
-                    break;
-                case(libtrainsim::core::ACTION_BREAK):
-                    sim->decellerate();
-                    break;
-                case(libtrainsim::core::ACTION_CLOSE):
-                    std::cout << "Esc key is pressed by user. Stoppig the video" << std::endl;
-                    sim->end();
-                    exitCode = 1;
-                    break;
-                default:
-                    break;
+        for(unsigned int i = 0; i < 10 && exitCode == 0;i++){      
+            
+            auto command = input.getKeyFunction();
+
+            if(command == "ACCELERATE"){
+                sim->accelerate();
+            }
+
+            if(command == "BREAK"){
+                sim->decellerate();
+            }
+
+            if(command == "CLOSE"){
+                std::cout << "Esc key is pressed by user. Stoppig the video" << std::endl;
+                sim->end();
+                exitCode = 1;
             }
         }
     };
