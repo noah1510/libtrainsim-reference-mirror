@@ -10,7 +10,7 @@ project(
         'b_coverage=false',
         'libtrainsim:build_full=true',
     ],
-    version:'0.5.0',
+    version:'0.7.0',
     meson_version: '>= 0.54.0',
 )
 
@@ -44,7 +44,7 @@ if target_machine.cpu_family() == 'ppc' or target_machine.cpu_family() == 'ppc64
 endif
 
 
-libtrainsim_version = '0.6.0'
+libtrainsim_version = '0.7.0'
 
 deps = [
     dependency('libtrainsim-full', required: true, fallback: 'libtrainsim', version : '>=' + libtrainsim_version),
