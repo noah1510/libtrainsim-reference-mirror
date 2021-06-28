@@ -17,12 +17,12 @@ int main(int argc, char **argv){
     }
     
     //check if the libtrainsim version is high enough
-    const libtrainsim::core::version required_version{0,6,0};
+    const libtrainsim::core::version required_version{0,8,0};
     assert((libtrainsim::core::lib_version >= required_version) && "libtrainsim version not high enogh!");
 
     //check if singeltons are running
     std::cout << libtrainsim::video::hello() << std::endl;
-    libtrainsim::video::setBackend(libtrainsim::ffmpeg_sdl);
+    libtrainsim::video::setBackend(libtrainsim::Video::VideoBackends::ffmpeg_SDL2);
     
     libtrainsim::control::input_handler input{};
     std::cout << input.hello() << std::endl;
