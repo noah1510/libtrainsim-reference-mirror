@@ -15,9 +15,9 @@ class simulator{
 
         sakurajin::unit_system::common::acceleration acceleration;
 
-        long double Speedlevel;
+        libtrainsim::core::input_axis Speedlevel;
 
-        
+
 
         const std::string window_name = " bahn_simulator";
         bool updateImage();
