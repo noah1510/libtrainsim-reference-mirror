@@ -92,7 +92,7 @@ bool simulator::updateImage(){
 
 void simulator::accelerate(){
     Speedlevel = phy.clampSpeedlevel(Speedlevel + 0.1);
-    if(abs(Speedlevel) < 0.07_mps2){Speedlevel = 0.0_mps2;};
+    if(abs(Speedlevel) < 0.07){Speedlevel = 0.0;};
     phy.setSpeedlevel(Speedlevel);
 
     /*
@@ -104,7 +104,7 @@ void simulator::accelerate(){
 
 void simulator::decellerate(){
     Speedlevel = phy.clampSpeedlevel(Speedlevel - 0.1);
-    if(abs(Speedlevel) < 0.07_mps2){Speedlevel = 0.0_mps2;};
+    if(abs(Speedlevel) < 0.07){Speedlevel = 0.0;};
     phy.setSpeedlevel(Speedlevel);
 
     /*
