@@ -83,7 +83,7 @@ bool simulator::updateImage(){
     auto next_time = libtrainsim::physics::now();
 
     base::time_si frametime = unit_cast(next_time-last_time, prefix::milli);
-    std::cout << "acceleration:" << std::setiosflags(std::ios::fixed) << std::setprecision(2) << acceleration << "; current velocity:" << phy.getVelocity() << "; current location:" << phy.getLocation() << " / " << track.lastLocation() << "; frametime:" << frametime.value << "ms; \r" << std::flush;
+    std::cout << "acceleration:" << std::setiosflags(std::ios::fixed) << std::setprecision(2) << acceleration << ";current Speedlevel:" << Speedlevel.get() << "; current velocity:" << phy.getVelocity() << "; current location:" << phy.getLocation() << " / " << track.lastLocation() << "; frametime:" << frametime.value << "ms; \r" << std::flush;
 
     last_time = next_time;
 
