@@ -13,8 +13,6 @@ class simulator{
         guardedVar<unsigned int> currentFrame = guardedVar<unsigned int>(0);
         guardedVar<bool> hasError = guardedVar<bool>(true);
 
-        sakurajin::unit_system::common::acceleration acceleration;
-
         libtrainsim::core::input_axis Speedlevel;
 
 

@@ -83,7 +83,7 @@ bool simulator::updateImage(){
     auto next_time = libtrainsim::physics::now();
 
     base::time_si frametime = unit_cast(next_time-last_time, prefix::milli);
-    std::cout << "acceleration:" << std::setiosflags(std::ios::fixed) << std::setprecision(2) << acceleration << ";current Speedlevel:" << Speedlevel.get() << "; current velocity:" << phy.getVelocity() << "; current location:" << phy.getLocation() << " / " << track.lastLocation() << "; frametime:" << frametime.value << "ms; \r" << std::flush;
+    std::cout << "acceleration:" << std::setiosflags(std::ios::fixed) << std::setprecision(2) << phy.getAcceleration() << ";current Speedlevel:" << Speedlevel.get() << "; current velocity:" << phy.getVelocity() << "; current location:" << phy.getLocation() << " / " << track.lastLocation() << "; frametime:" << frametime.value << "ms; \r" << std::flush;
 
     last_time = next_time;
 
@@ -94,24 +94,12 @@ void simulator::accelerate(){
     Speedlevel += 0.1;
     if(abs(Speedlevel.get()) < 0.07){Speedlevel = 0.0;};
     phy.setSpeedlevel(Speedlevel);
-
-    /*
-    acceleration = track.train().clampAcceleration(acceleration + 0.1_mps2);
-    if(abs(acceleration) < 0.07_mps2){acceleration = 0.0_mps2;};
-    phy.setAcelleration(acceleration);
-    */
 }
 
 void simulator::decellerate(){
     Speedlevel -= 0.1;
     if(abs(Speedlevel.get()) < 0.07){Speedlevel = 0.0;};
     phy.setSpeedlevel(Speedlevel);
-
-    /*
-    acceleration = track.train().clampAcceleration(acceleration - 0.1_mps2);
-    if(abs(acceleration) < 0.07_mps2){acceleration = 0.0_mps2;};
-    phy.setAcelleration(acceleration);
-    */
 }
 
 void simulator::end(){
