@@ -1,6 +1,6 @@
 name: libtrainsim # you probably want to 'snapcraft register <name>'
 base: core20 # the base snap is the execution environment for this snap
-version: '0.9.0' # just for humans, typically '1.2+git' or '1.3.2'
+version: '0.9.1' # just for humans, typically '1.2+git' or '1.3.2'
 summary: The reference implementaion of libtrainsim # 79 char long summary
 description: |
   This package contains builds of the reference implementation of libtrainsim with the date for one track.
@@ -23,38 +23,38 @@ parts:
     plugin: dump
     source-type: git
     source: https://git.thm.de/bahn-simulator/simulator.git
+    #source: .
     override-build: |
         export PATH=$PATH:/root/.local/bin
+        export MARCH="native"
+
+        if [ "$SNAPCRAFT_TARGET_ARCH" == "amd64" ];
+        then
+            export MARCH="athlon-fx"
+        fi
+
+        if [ "$SNAPCRAFT_TARGET_ARCH" == "arm64" ];
+        then
+            export MARCH="armv8-a"
+        fi
+
         python3 -m pip install "meson>=0.57.0"
-        CC=clang-10 CXX=clang++-10 meson setup --prefix $SNAPCRAFT_PART_INSTALL/usr/local -Dno-data=true --optimization 2 build
+        meson setup --prefix=/snap/libtrainsim/current/usr -Dno-data=true -Db_pgo=off -Dmarch="$MARCH" --optimization 2 build
+        meson configure build
         meson compile -C build
         meson install -C build
-        rsync --links --remove-source-files -r $SNAPCRAFT_PART_INSTALL/usr/local/lib/ $SNAPCRAFT_PART_INSTALL/usr/lib
-        rsync --links --remove-source-files -r $SNAPCRAFT_PART_INSTALL/usr/local/include/ $SNAPCRAFT_PART_INSTALL/usr/include
-        cp de.thm.simulator.desktop $SNAPCRAFT_PART_INSTALL/usr/local/share/libtrainsim/
-        
-    override-stage: |
-        snapcraftctl stage
-        sed -i 's|$SNAPCRAFT_STAGE/usr|/snap/libtrainsim/current/usr|g' $SNAPCRAFT_STAGE/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pkgconfig/*.pc
-        cat $SNAPCRAFT_STAGE/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pkgconfig/trainsim-core.pc
-        
+        cp de.thm.simulator.desktop /snap/libtrainsim/current/usr/share/libtrainsim/
+    
+    organize: 
+      /snap/libtrainsim/current/usr: usr
+      
     build-packages:
         - python3
         - python3-pip
         - python3-setuptools
         - python3-wheel
         - g++
-        - git
         - ninja-build
-        - curl
-        - bash
-        - rsync
-        - wget
-        - lsb-release
-        - software-properties-common
-        - lld-10
-        - lldb-10
-        - clang-10
 
         - libsdl2-dev
         - libavcodec-dev
@@ -65,8 +65,8 @@ parts:
         - libavutil-dev
         - libswresample-dev 
         - libswscale-dev 
-        - libpostproc-dev
-        
+        - libpostproc-dev  
+
     stage-packages:
         - libsdl2-2.0-0
         - libxss1
@@ -109,7 +109,7 @@ parts:
 apps:
   libtrainsim:
     extensions: [gnome-3-38]
-    desktop: usr/local/share/libtrainsim/de.thm.simulator.desktop
+    desktop: usr/share/libtrainsim/de.thm.simulator.desktop
     plugs:
         - home
         - desktop
@@ -117,11 +117,15 @@ apps:
         - opengl
         - wayland
         - x11
-    command: usr/local/share/libtrainsim/simulator
+        - gtk-3-themes
+        - icon-themes
+        - gnome-3-38-2004
+    command: usr/share/libtrainsim/simulator
     
 plugs:
   libtrainsim-data-plug:
     interface: content
     content: data
     target: $SNAP/data
+    
     

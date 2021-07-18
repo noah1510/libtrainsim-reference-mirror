@@ -17,7 +17,7 @@ int main(int argc, char **argv){
     }
 
     //check if the libtrainsim version is high enough
-    const libtrainsim::core::version required_version{0,9,0};
+    const libtrainsim::core::version required_version{0,9,1};
     assert((libtrainsim::core::lib_version >= required_version) && "libtrainsim version not high enogh!");
 
     //check if singeltons are running
