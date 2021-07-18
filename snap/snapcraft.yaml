@@ -120,6 +120,7 @@ apps:
         - gtk-3-themes
         - icon-themes
         - gnome-3-38-2004
+        - audio-playback
     command: usr/share/libtrainsim/simulator
     
 plugs:
