@@ -1,17 +1,17 @@
 project(
-    'simulator', 
-    'c', 
+    'simulator',
+    'c',
     'cpp',
     default_options : [
-        'c_std=c11', 
+        'c_std=c11',
         'cpp_std=c++17',
         'b_lto=true',
         'b_pgo=generate',
         'b_coverage=false',
         'libtrainsim:build_full=true',
     ],
-    version:'0.9.1',
-    meson_version: '>= 0.54.0',
+    version : '0.9.1',
+    meson_version : '>= 0.54.0',
 )
 
 #make the best out of the cpu arch

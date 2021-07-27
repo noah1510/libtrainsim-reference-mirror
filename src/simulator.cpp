@@ -63,6 +63,11 @@ bool simulator::updateImage(){
 
     phy.tick();
     auto loc = phy.getLocation();
+    
+    if(libtrainsim::video::reachedEndOfFile() || phy.reachedEnd()){
+        end();
+        return false;
+    }
 
     //get a new frame if needed
     if (last_position < loc || firstCall){
