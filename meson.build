@@ -10,7 +10,7 @@ project(
         'b_coverage=false',
         'libtrainsim:build_full=true',
     ],
-    version : '0.9.1',
+    version : '0.9.2',
     meson_version : '>= 0.54.0',
 )
 
@@ -21,7 +21,7 @@ add_global_arguments('-march=' + march, language : 'c')
 add_global_arguments('-march=' + march, language : 'cpp')
 
 #the minimum required libtrainsim version
-libtrainsim_version = '0.9.1'
+libtrainsim_version = '0.9.2'
 
 deps = [
     dependency('libtrainsim-full', required: true, fallback: 'libtrainsim', version : '>=' + libtrainsim_version),
