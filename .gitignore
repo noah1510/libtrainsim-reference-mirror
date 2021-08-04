@@ -5,7 +5,7 @@ include/redhand
 .cache
 
 subprojects/*
-!subprojects/*.wrap
+!subprojects/libtrainsim.wrap
 
 simulator\+\+.kdev4
 libtrainsim_*.snap
