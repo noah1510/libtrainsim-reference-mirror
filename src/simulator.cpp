@@ -52,6 +52,21 @@ simulator::simulator(const Track& dat):track{dat},phy{libtrainsim::physics(dat)}
         }
     });
 
+    serialcontrolLoop = std::async([&](){
+        auto lastLoop = libtrainsim::serialcontrol::now();
+        libtrainsim::serialcontrol serial;
+        serial.startup();
+        std::cout << "stated analog control loop" << std::endl;
+        while(!hasError){
+            auto nextTime = libtrainsim::serialcontrol::now();
+            if(nextTime-lastLoop > std::chrono::milliseconds(1)){
+                serial.updateSerial();
+                lastLoop = nextTime;
+            }
+            std::this_thread::sleep_for(std::chrono::nanoseconds(1));
+        }
+    });
+
     hasError = false;
 }
 
@@ -109,4 +124,16 @@ void simulator::decellerate(){
 
 void simulator::end(){
     hasError = true;
+}
+
+void simulator::serial_speedlvl(libtrainsim::core::input_axis Slvl){
+    Speedlevel = Slvl;
+    if (Speedlevel == -1.0){
+        while(phy.getVelocity() > 0.0_mps){
+            phy.setSpeedlevel(-1.0);
+        }
+    }else{
+        phy.setSpeedlevel(Speedlevel);
+    }
+    
 }

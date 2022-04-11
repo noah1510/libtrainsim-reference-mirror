@@ -1,5 +1,6 @@
 #include "video.hpp"
 #include "control.hpp"
+#include "serialcontrol.hpp"
 #include "track_configuration.hpp"
 #include <future>
 #include <memory>
@@ -19,7 +20,6 @@ int main(int argc, char **argv){
     //check if the libtrainsim version is high enough
     const libtrainsim::core::version required_version{0,9,2};
     assert((libtrainsim::core::lib_version >= required_version) && "libtrainsim version not high enogh!");
-
     //check if singeltons are running
     std::cout << libtrainsim::video::hello() << std::endl;
 
@@ -34,26 +34,45 @@ int main(int argc, char **argv){
         return 100;
     }
 
+    libtrainsim::serialcontrol serial;
+    serial.openCOMPort();
+
     std::cout << "first location" << track.firstLocation() << "; last location:" << track.lastLocation() << std::endl;
     auto sim = std::make_unique<simulator>(track);
+     
 
     while(!sim->hasErrored()){
         for(unsigned int i = 0; i < 10 && exitCode == 0;i++){
 
-            auto command = input.getKeyFunction();
+            if (serial.serialflag == true)
+            {   
 
-            if(command == "ACCELERATE"){
-                sim->accelerate();
+                sim->serial_speedlvl(serial.get_slvl());
+
+                auto command = input.getKeyFunction();
+                if(command == "CLOSE"){
+                    std::cout << "Esc key is pressed by user. Stoppig the video" << std::endl;
+                    sim->end();
+                    exitCode = 1;
+                }
             }
+            else
+            {
+                auto command = input.getKeyFunction();
 
-            if(command == "BREAK"){
-                sim->decellerate();
-            }
+                if(command == "ACCELERATE"){
+                    sim->accelerate();
+                }
 
-            if(command == "CLOSE"){
-                std::cout << "Esc key is pressed by user. Stoppig the video" << std::endl;
-                sim->end();
-                exitCode = 1;
+                if(command == "BREAK"){
+                    sim->decellerate();
+                }
+
+                if(command == "CLOSE"){
+                    std::cout << "Esc key is pressed by user. Stoppig the video" << std::endl;
+                    sim->end();
+                    exitCode = 1;
+                }
             }
         }
     };
