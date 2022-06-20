@@ -52,21 +52,6 @@ simulator::simulator(const Track& dat):track{dat},phy{libtrainsim::physics(dat)}
         }
     });
 
-    serialcontrolLoop = std::async([&](){
-        auto lastLoop = libtrainsim::serialcontrol::now();
-        libtrainsim::serialcontrol serial(1);
-        serial.startup();
-        std::cout << "stated analog control loop" << std::endl;
-        while(!hasError){
-            auto nextTime = libtrainsim::serialcontrol::now();
-            if(nextTime-lastLoop > std::chrono::milliseconds(1)){
-                serial.updateSerial();
-                lastLoop = nextTime;
-            }
-            std::this_thread::sleep_for(std::chrono::nanoseconds(1));
-        }
-    });
-
     hasError = false;
 }
 
