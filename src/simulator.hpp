@@ -20,7 +20,6 @@ class simulator{
 
         const std::string window_name = " bahn_simulator";
         bool updateImage();
-        void updateSerial();
 
         std::future<void> graphicsLoop;
         std::future<void> serialcontrolLoop;

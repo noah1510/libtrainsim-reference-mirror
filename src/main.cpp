@@ -35,18 +35,13 @@ int main(int argc, char **argv){
     }
 
     libtrainsim::serialcontrol serial;
-    serial.openCOMPort();
 
     std::cout << "first location" << track.firstLocation() << "; last location:" << track.lastLocation() << std::endl;
     auto sim = std::make_unique<simulator>(track);
-     
 
-    while(!sim->hasErrored()){
+    while(!sim->hasErrored()){     
         for(unsigned int i = 0; i < 10 && exitCode == 0;i++){
-
-            if (serial.serialflag == true)
-            {   
-
+            if (serial.get_serialflag() == 1){   
                 sim->serial_speedlvl(serial.get_slvl());
 
                 auto command = input.getKeyFunction();
@@ -55,9 +50,7 @@ int main(int argc, char **argv){
                     sim->end();
                     exitCode = 1;
                 }
-            }
-            else
-            {
+            } else{
                 auto command = input.getKeyFunction();
 
                 if(command == "ACCELERATE"){

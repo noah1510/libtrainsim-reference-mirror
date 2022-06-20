@@ -54,7 +54,7 @@ simulator::simulator(const Track& dat):track{dat},phy{libtrainsim::physics(dat)}
 
     serialcontrolLoop = std::async([&](){
         auto lastLoop = libtrainsim::serialcontrol::now();
-        libtrainsim::serialcontrol serial;
+        libtrainsim::serialcontrol serial(1);
         serial.startup();
         std::cout << "stated analog control loop" << std::endl;
         while(!hasError){

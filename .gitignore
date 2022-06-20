@@ -1,6 +1,7 @@
 build
 lib
 include/redhand
+.vscode/
 
 .cache
 
