@@ -34,7 +34,7 @@ int main(int argc, char **argv){
         return 100;
     }
 
-    libtrainsim::serialcontrol serial(1);
+    libtrainsim::serialcontrol serial;
     serial.startup();
 
     std::cout << "first location" << track.firstLocation() << "; last location:" << track.lastLocation() << std::endl;
