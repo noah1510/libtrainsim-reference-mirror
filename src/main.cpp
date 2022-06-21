@@ -34,16 +34,15 @@ int main(int argc, char **argv){
         return 100;
     }
 
-    libtrainsim::serialcontrol serial;
-    serial.startup();
+    libtrainsim::serialcontrol serial("data/production_data/config_serial_input.json");
 
     std::cout << "first location" << track.firstLocation() << "; last location:" << track.lastLocation() << std::endl;
     auto sim = std::make_unique<simulator>(track);
 
     while(!sim->hasErrored()){     
         for(unsigned int i = 0; i < 10 && exitCode == 0;i++){
-            if (serial.get_serialflag() == 1){
-                serial.updateSerial();   
+            if (serial.get_isConnected() == true){
+                serial.update();   
                 sim->serial_speedlvl(serial.get_slvl());
 
                 auto command = input.getKeyFunction();
