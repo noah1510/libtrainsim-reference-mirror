@@ -41,7 +41,7 @@ int main(int argc, char **argv){
 
     while(!sim->hasErrored()){     
         for(unsigned int i = 0; i < 10 && exitCode == 0;i++){
-            if (serial.get_isConnected() == true){
+            if (serial.IsConnected() == true){
                 serial.update();   
                 sim->serial_speedlvl(serial.get_slvl());
 
