@@ -112,5 +112,5 @@ void simulator::end(){
 }
 
 void simulator::serial_speedlvl(libtrainsim::core::input_axis Slvl){
-            phy.setSpeedlevel(Slvl);    
+    phy.setSpeedlevel(Slvl);    
 }
