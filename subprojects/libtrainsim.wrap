@@ -1,5 +1,5 @@
 [wrap-git]
-url = https://git.thm.de/tsnr18/libtrainsim.git
+url = https://git.thm.de/bahn-simulator/libtrainsim.git
 revision = main
 
 [provides]

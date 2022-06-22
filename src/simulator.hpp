@@ -22,7 +22,6 @@ class simulator{
         bool updateImage();
 
         std::future<void> graphicsLoop;
-        std::future<void> serialcontrolLoop;
 
         libtrainsim::core::Track track;
         libtrainsim::physics phy;

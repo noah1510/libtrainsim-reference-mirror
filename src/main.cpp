@@ -39,9 +39,9 @@ int main(int argc, char **argv){
     std::cout << "first location" << track.firstLocation() << "; last location:" << track.lastLocation() << std::endl;
     auto sim = std::make_unique<simulator>(track);
 
-    while(!sim->hasErrored()){     
+    while(!sim->hasErrored()){
         for(unsigned int i = 0; i < 10 && exitCode == 0;i++){
-            if (serial.IsConnected() == true){
+            if (serial.IsConnected()){
                 serial.update();   
                 sim->serial_speedlvl(serial.get_slvl());
 

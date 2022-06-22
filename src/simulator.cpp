@@ -112,13 +112,5 @@ void simulator::end(){
 }
 
 void simulator::serial_speedlvl(libtrainsim::core::input_axis Slvl){
-    Speedlevel = Slvl;
-    if (Speedlevel == -1.0){
-        while(phy.getVelocity() > 0.0_mps){
-            phy.setSpeedlevel(-1.0);
-        }
-    }else{
-        phy.setSpeedlevel(Speedlevel);
-    }
-    
+            phy.setSpeedlevel(Slvl);    
 }
