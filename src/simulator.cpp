@@ -110,3 +110,7 @@ void simulator::decellerate(){
 void simulator::end(){
     hasError = true;
 }
+
+void simulator::serial_speedlvl(libtrainsim::core::input_axis Slvl){
+    phy.setSpeedlevel(Slvl);    
+}

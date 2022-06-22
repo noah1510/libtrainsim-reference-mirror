@@ -6,6 +6,7 @@
 #include "video.hpp"
 #include "track_configuration.hpp"
 #include "physics.hpp"
+#include "serialcontrol.hpp"
 #include <future>
 
 class simulator{
@@ -25,6 +26,7 @@ class simulator{
         libtrainsim::core::Track track;
         libtrainsim::physics phy;
 
+
     public:
         simulator(const libtrainsim::core::Track& dat);
         ~simulator();
@@ -34,4 +36,5 @@ class simulator{
         void accelerate();
         void decellerate();
 
+        void serial_speedlvl(libtrainsim::core::input_axis Slvl);
 };
