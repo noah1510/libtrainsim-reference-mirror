@@ -95,16 +95,8 @@ bool simulator::updateImage(){
     return false;
 }
 
-void simulator::accelerate(){
-    Speedlevel += 0.1;
-    if(abs(Speedlevel.get()) < 0.07){Speedlevel = 0.0;};
-    phy.setSpeedlevel(Speedlevel);
-}
-
-void simulator::decellerate(){
-    Speedlevel -= 0.1;
-    if(abs(Speedlevel.get()) < 0.07){Speedlevel = 0.0;};
-    phy.setSpeedlevel(Speedlevel);
+void simulator::emergencyBreak(){
+    phy.emergencyBreak();
 }
 
 void simulator::end(){
@@ -112,5 +104,6 @@ void simulator::end(){
 }
 
 void simulator::serial_speedlvl(libtrainsim::core::input_axis Slvl){
+    Speedlevel = Slvl;
     phy.setSpeedlevel(Slvl);    
 }

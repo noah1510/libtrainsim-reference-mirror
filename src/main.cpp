@@ -41,10 +41,15 @@ int main(int argc, char **argv){
 
     while(!sim->hasErrored()){
         for(unsigned int i = 0; i < 10 && exitCode == 0;i++){
+            
             if (serial.IsConnected()){
                 serial.update();   
                 sim->serial_speedlvl(serial.get_slvl());
-
+                
+                if(serial.get_emergencyflag()){
+                    sim->emergencyBreak();
+                }
+                
                 auto command = input.getKeyFunction();
                 if(command == "CLOSE"){
                     std::cout << "Esc key is pressed by user. Stoppig the video" << std::endl;
@@ -52,22 +57,21 @@ int main(int argc, char **argv){
                     exitCode = 1;
                 }
             } else{
-                auto command = input.getKeyFunction();
-
-                if(command == "ACCELERATE"){
-                    sim->accelerate();
+                sim->serial_speedlvl(input.getSpeedAxis());
+                
+                if(input.emergencyFlag()){
+                    sim->emergencyBreak();
                 }
-
-                if(command == "BREAK"){
-                    sim->decellerate();
-                }
-
-                if(command == "CLOSE"){
+                
+                if(input.closingFlag()){
                     std::cout << "Esc key is pressed by user. Stoppig the video" << std::endl;
                     sim->end();
                     exitCode = 1;
                 }
+
             }
+
+            
         }
     };
 

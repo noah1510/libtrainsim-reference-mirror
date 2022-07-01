@@ -32,9 +32,8 @@ class simulator{
         ~simulator();
         bool hasErrored();
         void end();
-
-        void accelerate();
-        void decellerate();
+        
+        void emergencyBreak();
 
         void serial_speedlvl(libtrainsim::core::input_axis Slvl);
 };
