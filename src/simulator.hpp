@@ -7,6 +7,7 @@
 #include "track_configuration.hpp"
 #include "physics.hpp"
 #include "serialcontrol.hpp"
+#include "helper.hpp"
 #include <future>
 
 class simulator{

@@ -28,16 +28,18 @@ int main(int argc, char **argv){
     libtrainsim::control::input_handler input{};
     std::cout << input.hello() << std::endl;
 
-    const auto track = libtrainsim::core::Track(argc > 1 ? argv[1] : "data/production_data/Track.json");
-    if(!track.isValid()){
-        std::cerr << "track data not valid" << std::endl;
+    std::optional<libtrainsim::core::Track> track;
+    try{
+        track = libtrainsim::core::Track(argc > 1 ? argv[1] : "data/production_data/Track.json");
+    }catch(const std::exception& e){
+        libtrainsim::core::Helper::print_exception(e);
         return 100;
     }
 
     libtrainsim::serialcontrol serial("data/production_data/config_serial_input.json");
 
-    std::cout << "first location" << track.firstLocation() << "; last location:" << track.lastLocation() << std::endl;
-    auto sim = std::make_unique<simulator>(track);
+    std::cout << "first location" << track->firstLocation() << "; last location:" << track->lastLocation() << std::endl;
+    auto sim = std::make_unique<simulator>(track.value());
 
     while(!sim->hasErrored()){
         for(unsigned int i = 0; i < 10 && exitCode == 0;i++){

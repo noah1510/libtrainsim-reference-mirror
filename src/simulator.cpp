@@ -26,11 +26,6 @@ simulator::~simulator(){
 
 simulator::simulator(const Track& dat):track{dat},phy{libtrainsim::physics(dat)}{
     //load video file
-    if(!dat.isValid()){
-        std::cout << "ERROR::SIMULATOR::NON_VALID_TRACK" << std::endl;
-        return;
-    }
-
     if(!libtrainsim::video::load(dat.getVideoFilePath())){
         std::cout << "ERROR::SIMULATOR::COULD_NOT_LOAD_VIDEO" << std::endl;
         return;
