@@ -5,10 +5,12 @@ project(
     default_options : [
         'c_std=c11',
         'cpp_std=c++17',
-        'b_lto=true',
-        'b_pgo=generate',
         'b_coverage=false',
         'libtrainsim:build_full=true',
+        'libtrainsim:video_backend_glfw3=False',
+        'libtrainsim:video_backend_opencv=False',
+        'b_lto=true',
+        'b_pgo=generate'
     ],
     version : '0.9.2',
     meson_version : '>= 0.54.0',
