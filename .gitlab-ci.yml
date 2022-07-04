@@ -1,9 +1,9 @@
-image: noasakurajin/libtrainsim-build-container:fedora
+image: git-registry.thm.de/bahn-simulator/docker-containers/libtrainsim-build-container:fedora
 
 build:
   stage: build
   script:
-    - meson setup build
+    - meson setup -Dvideo_backend_opencv=false -Dvideo_backend_glfw3=false build
     - meson compile -C build
     - meson test -C build
   only:
