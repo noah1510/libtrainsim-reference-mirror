@@ -3,7 +3,7 @@ image: git-registry.thm.de/bahn-simulator/docker-containers/libtrainsim:fedora
 build:
   stage: build
   script:
-    - meson setup -Dvideo_backend_opencv=false -Dvideo_backend_glfw3=false build
+    - meson setup build
     - meson compile -C build
     - meson test -C build
   only:
