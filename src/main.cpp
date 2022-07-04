@@ -2,6 +2,7 @@
 #include "control.hpp"
 #include "serialcontrol.hpp"
 #include "track_configuration.hpp"
+#include "simulator_config.hpp"
 #include <future>
 #include <memory>
 #include <cassert>
@@ -28,15 +29,19 @@ int main(int argc, char **argv){
     libtrainsim::control::input_handler input{};
     std::cout << input.hello() << std::endl;
 
+    std::optional<libtrainsim::core::simulatorConfiguration> conf;
     std::optional<libtrainsim::core::Track> track;
+    std::optional<libtrainsim::serialcontrol> serial;
     try{
+        conf = std::make_optional<libtrainsim::core::simulatorConfiguration>("data/production_data/simulator.json");
         track = libtrainsim::core::Track(argc > 1 ? argv[1] : "data/production_data/Track.json");
+        serial  = std::make_optional<libtrainsim::serialcontrol>(conf->getSerialConfigLocation());
+        
     }catch(const std::exception& e){
         libtrainsim::core::Helper::print_exception(e);
         return 100;
     }
-
-    libtrainsim::serialcontrol serial("data/production_data/config_serial_input.json");
+   
 
     std::cout << "first location" << track->firstLocation() << "; last location:" << track->lastLocation() << std::endl;
     auto sim = std::make_unique<simulator>(track.value());
@@ -44,11 +49,11 @@ int main(int argc, char **argv){
     while(!sim->hasErrored()){
         for(unsigned int i = 0; i < 10 && exitCode == 0;i++){
             
-            if (serial.IsConnected()){
-                serial.update();   
-                sim->serial_speedlvl(serial.get_slvl());
+            if (serial->IsConnected()){
+                serial->update();   
+                sim->serial_speedlvl(serial->get_slvl());
                 
-                if(serial.get_emergencyflag()){
+                if(serial->get_emergencyflag()){
                     sim->emergencyBreak();
                 }
                 
