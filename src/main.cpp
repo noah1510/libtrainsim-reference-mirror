@@ -30,21 +30,21 @@ int main(int argc, char **argv){
     std::cout << input.hello() << std::endl;
 
     std::optional<libtrainsim::core::simulatorConfiguration> conf;
-    std::optional<libtrainsim::core::Track> track;
     std::optional<libtrainsim::serialcontrol> serial;
     try{
-        conf = std::make_optional<libtrainsim::core::simulatorConfiguration>("data/production_data/simulator.json");
-        track = libtrainsim::core::Track(argc > 1 ? argv[1] : "data/production_data/Track.json");
-        serial  = std::make_optional<libtrainsim::serialcontrol>(conf->getSerialConfigLocation());
+        std::filesystem::path config_loc = argc > 1 ? argv[1] : "data/production_data/simulator.json";
+        conf = std::make_optional<libtrainsim::core::simulatorConfiguration>(config_loc);
+        serial = std::make_optional<libtrainsim::serialcontrol>(conf->getSerialConfigLocation());
         
     }catch(const std::exception& e){
         libtrainsim::core::Helper::print_exception(e);
         return 100;
     }
    
+    auto track = conf->getCurrentTrack();
 
-    std::cout << "first location" << track->firstLocation() << "; last location:" << track->lastLocation() << std::endl;
-    auto sim = std::make_unique<simulator>(track.value());
+    std::cout << "first location" << track.firstLocation() << "; last location:" << track.lastLocation() << std::endl;
+    auto sim = std::make_unique<simulator>(track);
 
     while(!sim->hasErrored()){
         for(unsigned int i = 0; i < 10 && exitCode == 0;i++){
