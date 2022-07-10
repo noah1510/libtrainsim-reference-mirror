@@ -48,7 +48,7 @@ int main(int argc, char **argv){
     try{
         sim = std::make_unique<simulator>(track);
     }catch(const std::exception& e){
-        print_exception(e);
+        libtrainsim::core::Helper::print_exception(e);
         return -1;
     }
 
