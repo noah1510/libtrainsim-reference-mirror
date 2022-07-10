@@ -43,7 +43,14 @@ int main(int argc, char **argv){
     auto track = conf->getCurrentTrack();
 
     std::cout << "first location" << track.firstLocation() << "; last location:" << track.lastLocation() << std::endl;
-    auto sim = std::make_unique<simulator>(track);
+    
+    std::unique_ptr<simulator> sim;
+    try{
+        sim = std::make_unique<simulator>(track);
+    }catch(const std::exception& e){
+        print_exception(e);
+        return -1;
+    }
 
     while(!sim->hasErrored()){
         for(unsigned int i = 0; i < 10 && exitCode == 0;i++){
