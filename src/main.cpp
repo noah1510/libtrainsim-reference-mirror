@@ -1,14 +1,12 @@
 #include "video.hpp"
 #include "control.hpp"
-#include "serialcontrol.hpp"
-#include "track_configuration.hpp"
 #include "simulator_config.hpp"
+
 #include <future>
 #include <memory>
 #include <cassert>
 
 #include "simulator.hpp"
-#include "control.hpp"
 
 int main(int argc, char **argv){
     int exitCode = 0;
@@ -19,7 +17,7 @@ int main(int argc, char **argv){
     }
 
     //check if the libtrainsim version is high enough
-    const libtrainsim::core::version required_version{0,9,2};
+    const libtrainsim::core::version required_version{0,10,0};
     assert((libtrainsim::core::lib_version >= required_version) && "libtrainsim version not high enogh!");
     //check if singeltons are running
     std::cout << libtrainsim::video::hello() << std::endl;

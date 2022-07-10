@@ -13,6 +13,18 @@ Now you can just enter `libtrainsim` into the terminal and the simulator should 
 
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/libtrainsim)
 
+## Important update notcies
+
+### Verison 0.10.0
+
+As of version 0.10.0 (format version 0.7.0) there is a simulator configuration.
+Because of this you can no longer provide the Track file you want to start as a parameter but have to pass the simulator config file instead.
+The default one is `data/prodcution_data/simulator.json`.
+
+If you want working serial Input on windows (and maybe OSX) you have to modify the serial configuration file.
+You should only have to change the comport field to the comport the hardware is connected to.
+The default one is `data/prodcution_data/config_serial_input.json`.
+
 ## Building the code
 
 Clone the repository using `git clone https://git.thm.de/bahn-simulator/simulator.git`.
@@ -28,13 +40,12 @@ If it is a problem with libtrainsim instead of the simulator the issue will be m
 ## dependencies
 
 The following dependencies are needed to compile the code.
-On Windows these can be installed with [choco](https://chocolatey.org/) and on Linux you can use your package manager.
-You don't need opencv if you have ffmpeg. Opencv provides an additional video backend which has bad performance (if both are installed ffmpeg is used by default).
+On Windows these can be installed with [msys2](https://www.msys2.org/), on OSX using [homebrew](https://brew.sh/) and on Linux you can use your package manager.
+***The opencv and glfw backends will be removed in version 0.11.0 and are disabled by default now***
 
 * [meson](https://mesonbuild.com/) (version > 0.54.0)
 * [ffmpeg](https://www.ffmpeg.org/download.html) you need the development headers for the libraries
 * some C++ compiler (Gcc or llvm/clang) (needs support for `<filesystem>` C++17 header; GCC > 9.2.0, Clang > 10.0.0)
-* [opencv](https://opencv.org/releases/) (version > 2.4.0) (optinal instead of ffmpeg)
 
 ## development environment
 
