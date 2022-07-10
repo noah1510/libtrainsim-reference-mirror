@@ -26,21 +26,24 @@ int main(int argc, char **argv){
 
     libtrainsim::video::setBackend(libtrainsim::Video::VideoBackends::ffmpeg_SDL2);
 
-    libtrainsim::control::input_handler input{};
-    std::cout << input.hello() << std::endl;
-
     std::optional<libtrainsim::core::simulatorConfiguration> conf;
-    std::optional<libtrainsim::serialcontrol> serial;
     try{
         std::filesystem::path config_loc = argc > 1 ? argv[1] : "data/production_data/simulator.json";
         conf = std::make_optional<libtrainsim::core::simulatorConfiguration>(config_loc);
-        serial = std::make_optional<libtrainsim::serialcontrol>(conf->getSerialConfigLocation());
         
     }catch(const std::exception& e){
         libtrainsim::core::Helper::print_exception(e);
         return 100;
     }
    
+    std::optional<libtrainsim::control::input_handler> input;
+    try{
+        input = std::make_optional<libtrainsim::control::input_handler>(conf->getSerialConfigLocation());
+    }catch(const std::exception& e){
+        libtrainsim::core::Helper::print_exception(e);
+        return 100;
+    }
+
     auto track = conf->getCurrentTrack();
 
     std::cout << "first location" << track.firstLocation() << "; last location:" << track.lastLocation() << std::endl;
@@ -49,35 +52,18 @@ int main(int argc, char **argv){
     while(!sim->hasErrored()){
         for(unsigned int i = 0; i < 10 && exitCode == 0;i++){
             
-            if (serial->IsConnected()){
-                serial->update();   
-                sim->serial_speedlvl(serial->get_slvl());
-                
-                if(serial->get_emergencyflag()){
-                    sim->emergencyBreak();
-                }
-                
-                auto command = input.getKeyFunction();
-                if(command == "CLOSE"){
-                    std::cout << "Esc key is pressed by user. Stoppig the video" << std::endl;
-                    sim->end();
-                    exitCode = 1;
-                }
-            } else{
-                sim->serial_speedlvl(input.getSpeedAxis());
-                
-                if(input.emergencyFlag()){
-                    sim->emergencyBreak();
-                }
-                
-                if(input.closingFlag()){
-                    std::cout << "Esc key is pressed by user. Stoppig the video" << std::endl;
-                    sim->end();
-                    exitCode = 1;
-                }
-
+            input->update();
+            sim->serial_speedlvl(input->getSpeedAxis());
+            
+            if(input->emergencyFlag()){
+                sim->emergencyBreak();
             }
-
+            
+            if(input->closingFlag()){
+                std::cout << "Esc key is pressed by user. Stoppig the video" << std::endl;
+                sim->end();
+                exitCode = 1;
+            }
             
         }
     };
