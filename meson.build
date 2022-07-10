@@ -23,7 +23,7 @@ add_global_arguments('-march=' + march, language : 'c')
 add_global_arguments('-march=' + march, language : 'cpp')
 
 #the minimum required libtrainsim version
-libtrainsim_version = meson.version()
+libtrainsim_version = meson.project_version()
 
 deps = [
     dependency('libtrainsim-full', required: true, fallback: 'libtrainsim', version : '>=' + libtrainsim_version),
