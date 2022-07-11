@@ -105,7 +105,7 @@ parts:
         - libxvidcore4
         - libzvbi0
         - ocl-icd-libopencl1
-    
+
 apps:
   libtrainsim:
     extensions: [gnome-3-38]
@@ -123,11 +123,14 @@ apps:
         - audio-playback
         - serial-port
     command: usr/share/libtrainsim/simulator
-    
+
 plugs:
   libtrainsim-data-plug:
     interface: content
     content: data
     target: $SNAP/data
-    
-    
+
+slots:
+  serial-ttyACM0:
+    interface: serial-port
+    path: /dev/ttyACM0
