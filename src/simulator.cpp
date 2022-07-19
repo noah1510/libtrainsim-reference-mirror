@@ -25,14 +25,15 @@ simulator::~simulator(){
 }
 
 simulator::simulator(const Track& dat):track{dat},phy{libtrainsim::physics(dat)}{
+    
     //load video file
-    if(!libtrainsim::video::load(dat.getVideoFilePath())){
+    if(!libtrainsim::video::load(track.getVideoFilePath())){
         std::cout << "ERROR::SIMULATOR::COULD_NOT_LOAD_VIDEO" << std::endl;
         return;
     }
 
     //creating the window used to display stuff
-    libtrainsim::video::createWindow(window_name);
+    libtrainsim::video::createWindow(track.getName());
 
     graphicsLoop = std::async([&](){
         auto lastLoop = libtrainsim::physics::now();

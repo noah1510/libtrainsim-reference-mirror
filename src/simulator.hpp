@@ -17,14 +17,11 @@ class simulator{
 
         libtrainsim::core::input_axis Speedlevel;
 
-
-
-        const std::string window_name = " bahn_simulator";
         bool updateImage();
 
         std::future<void> graphicsLoop;
 
-        libtrainsim::core::Track track;
+        const libtrainsim::core::Track& track;
         libtrainsim::physics phy;
 
 
