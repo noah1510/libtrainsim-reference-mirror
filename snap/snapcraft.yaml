@@ -129,8 +129,3 @@ plugs:
     interface: content
     content: data
     target: $SNAP/data
-
-slots:
-  serial-ttyACM0:
-    interface: serial-port
-    path: /dev/ttyACM0
