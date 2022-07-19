@@ -19,15 +19,13 @@ int main(int argc, char **argv){
     //check if the libtrainsim version is high enough
     const libtrainsim::core::version required_version{0,10,0};
     assert((libtrainsim::core::lib_version >= required_version) && "libtrainsim version not high enogh!");
-    //check if singeltons are running
-    std::cout << libtrainsim::video::hello() << std::endl;
 
     libtrainsim::video::setBackend(libtrainsim::Video::VideoBackends::ffmpeg_SDL2);
 
     std::optional<libtrainsim::core::simulatorConfiguration> conf;
     try{
         std::filesystem::path config_loc = argc > 1 ? argv[1] : "data/production_data/simulator.json";
-        conf = std::make_optional<libtrainsim::core::simulatorConfiguration>(config_loc);
+        conf = std::make_optional<libtrainsim::core::simulatorConfiguration>(config_loc, true);
         
     }catch(const std::exception& e){
         libtrainsim::core::Helper::print_exception(e);
