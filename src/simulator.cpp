@@ -24,18 +24,17 @@ simulator::~simulator(){
     std::cout << "simulator has exited" << std::endl;
 }
 
-simulator::simulator(const Track& dat):track{dat},phy{libtrainsim::physics(dat)}{
-    
+simulator::simulator(const Track& dat):track{dat},phy{dat},video{}{
     //load video file
     try{
-        libtrainsim::video::load(track.getVideoFilePath());
+        video.load(track.getVideoFilePath());
     }catch(...){
         std::throw_with_nested(std::runtime_error("could not load video"));
     }
 
     //creating the window used to display stuff
     try{
-        libtrainsim::video::createWindow(track.getName());
+        video.createWindow(track.getName());
     }catch(...){
         std::throw_with_nested(std::runtime_error("could not create window"));
     }
@@ -65,7 +64,7 @@ bool simulator::updateImage(){
     phy.tick();
     auto loc = phy.getLocation();
     
-    if(libtrainsim::video::reachedEndOfFile() || phy.reachedEnd()){
+    if(video.reachedEndOfFile() || phy.reachedEnd()){
         end();
         return false;
     }
@@ -77,13 +76,13 @@ bool simulator::updateImage(){
         //get the next frame that will be displayed
         auto frame_num = track.data().getFrame(loc);
 
-        libtrainsim::video::gotoFrame(frame_num);
+        video.gotoFrame(frame_num);
 
         //update the last position
         last_position = loc;
-    }else{
-        libtrainsim::video::refreshWindow();
     }
+    
+    video.refreshWindow();
 
     //display statistics (speed, location, frametime, etc.)
     auto next_time = libtrainsim::physics::now();

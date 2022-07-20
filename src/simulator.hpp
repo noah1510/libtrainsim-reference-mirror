@@ -24,6 +24,7 @@ class simulator{
         const libtrainsim::core::Track& track;
         libtrainsim::physics phy;
 
+        libtrainsim::Video::videoManager video;
 
     public:
         simulator(const libtrainsim::core::Track& dat);
