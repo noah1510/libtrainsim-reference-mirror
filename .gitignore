@@ -20,3 +20,5 @@ libtrainsim_ppc64el*.txt
 *.profraw
 
 *.kdev4
+
+imgui.ini
