@@ -12,7 +12,7 @@ project(
         'b_lto=true',
         'b_pgo=generate'
     ],
-    version : '0.10.0',
+    version : '0.11.0',
     meson_version : '>= 0.54.0',
 )
 

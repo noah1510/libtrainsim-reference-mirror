@@ -19,38 +19,25 @@ bool simulator::hasErrored(){
 
 simulator::~simulator(){
     hasError = true;
-    graphicsLoop.get();
+    //graphicsLoop.get();
     std::cout << std::endl;
     std::cout << "simulator has exited" << std::endl;
 }
 
-simulator::simulator(const Track& dat):track{dat},phy{dat},video{}{
+simulator::simulator(const Track& dat):track{dat},phy{dat},video{},statusWindow{}{
     //load video file
     try{
         video.load(track.getVideoFilePath());
     }catch(...){
         std::throw_with_nested(std::runtime_error("could not load video"));
     }
-
-    //creating the window used to display stuff
+    
+    //create the empty window
     try{
         video.createWindow(track.getName());
-    }catch(...){
-        std::throw_with_nested(std::runtime_error("could not create window"));
+    }catch(const std::exception& e){
+        std::throw_with_nested(std::runtime_error("Could not create simulator window"));
     }
-
-    graphicsLoop = std::async([&](){
-        auto lastLoop = libtrainsim::physics::now();
-        std::cout << "stated graphics loop" << std::endl;
-        while(!hasError){
-            auto nextTime = libtrainsim::physics::now();
-            if(nextTime-lastLoop > std::chrono::milliseconds(1)){
-                updateImage();
-                lastLoop = nextTime;
-            }
-            std::this_thread::sleep_for(std::chrono::nanoseconds(1));
-        }
-    });
 
     hasError = false;
 }
@@ -61,9 +48,11 @@ bool simulator::updateImage(){
     static auto last_time = libtrainsim::physics::now();
     static bool firstCall = true;
 
+    //update the physics
     phy.tick();
     auto loc = phy.getLocation();
     
+    //check if the simulator has to be closed
     if(video.reachedEndOfFile() || phy.reachedEnd()){
         end();
         return false;
@@ -76,19 +65,38 @@ bool simulator::updateImage(){
         //get the next frame that will be displayed
         auto frame_num = track.data().getFrame(loc);
 
+        //if there is already a frame that is being rendered
+        //then this call will buffer the furthest frame to be rendered
         video.gotoFrame(frame_num);
 
         //update the last position
         last_position = loc;
     }
     
-    video.refreshWindow();
+    //actually render all of the windows
+    try{
+        libtrainsim::Video::imguiHandler::startRender();
+        
+        video.refreshWindow();
+        statusWindow.update();
+        
+        libtrainsim::Video::imguiHandler::endRender();
+    }catch(...){
+        std::throw_with_nested(std::runtime_error("Error rendering the windows"));
+    }
 
     //display statistics (speed, location, frametime, etc.)
     auto next_time = libtrainsim::physics::now();
-
+    
     base::time_si frametime = unit_cast(next_time-last_time, prefix::milli);
-    std::cout << "acceleration:" << std::setiosflags(std::ios::fixed) << std::setprecision(2) << phy.getAcceleration() << ";current Speedlevel:" << Speedlevel.get() << "; current velocity:" << phy.getVelocity() << "; current location:" << phy.getLocation() << " / " << track.lastLocation() << "; frametime:" << frametime.value << "ms; \r" << std::flush;
+    statusWindow.appendFrametime(frametime);
+    
+    statusWindow.changePosition(phy.getLocation());
+    statusWindow.changeEndPosition(track.lastLocation());
+    
+    statusWindow.setAcceleration(phy.getAcceleration());
+    statusWindow.setSpeedLevel(Speedlevel);
+    statusWindow.setVelocity(phy.getVelocity());
 
     last_time = next_time;
 

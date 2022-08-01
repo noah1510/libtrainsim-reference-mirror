@@ -8,6 +8,7 @@
 #include "physics.hpp"
 #include "serialcontrol.hpp"
 #include "helper.hpp"
+#include "statusDisplay.hpp"
 #include <future>
 
 class simulator{
@@ -17,7 +18,6 @@ class simulator{
 
         libtrainsim::core::input_axis Speedlevel;
 
-        bool updateImage();
 
         std::future<void> graphicsLoop;
 
@@ -25,6 +25,7 @@ class simulator{
         libtrainsim::physics phy;
 
         libtrainsim::Video::videoManager video;
+        libtrainsim::Video::statusDisplay statusWindow;
 
     public:
         simulator(const libtrainsim::core::Track& dat);
@@ -33,6 +34,7 @@ class simulator{
         void end();
         
         void emergencyBreak();
+        bool updateImage();
 
         void serial_speedlvl(libtrainsim::core::input_axis Slvl);
 };
