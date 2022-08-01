@@ -7,8 +7,6 @@ project(
         'cpp_std=c++17',
         'b_coverage=false',
         'libtrainsim:build_full=true',
-        'libtrainsim:video_backend_glfw3=False',
-        'libtrainsim:video_backend_opencv=False',
         'b_lto=true',
         'b_pgo=generate'
     ],
