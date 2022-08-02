@@ -9,6 +9,7 @@
 #include "serialcontrol.hpp"
 #include "helper.hpp"
 #include "statusDisplay.hpp"
+#include "simulator_config.hpp"
 #include <future>
 
 class simulator{
@@ -17,7 +18,6 @@ class simulator{
         guardedVar<bool> hasError = guardedVar<bool>(true);
 
         libtrainsim::core::input_axis Speedlevel;
-
 
         std::future<void> graphicsLoop;
 
@@ -28,7 +28,7 @@ class simulator{
         libtrainsim::Video::statusDisplay statusWindow;
 
     public:
-        simulator(const libtrainsim::core::Track& dat);
+        simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> settings);
         ~simulator();
         bool hasErrored();
         void end();

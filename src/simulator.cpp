@@ -24,7 +24,12 @@ simulator::~simulator(){
     std::cout << "simulator has exited" << std::endl;
 }
 
-simulator::simulator(const Track& dat):track{dat},phy{dat},video{},statusWindow{}{
+simulator::simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> settings):
+    track{settings->getCurrentTrack()},
+    phy{settings->getCurrentTrack()},
+    video{},
+    statusWindow{}
+{
     //load video file
     try{
         video.load(track.getVideoFilePath());
@@ -34,7 +39,7 @@ simulator::simulator(const Track& dat):track{dat},phy{dat},video{},statusWindow{
     
     //create the empty window
     try{
-        video.createWindow(track.getName());
+        video.createWindow(track.getName(),settings->getShaderLocation());
     }catch(const std::exception& e){
         std::throw_with_nested(std::runtime_error("Could not create simulator window"));
     }

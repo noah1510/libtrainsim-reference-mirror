@@ -41,15 +41,11 @@ int main(int argc, char **argv){
         libtrainsim::core::Helper::print_exception(e);
         return 100;
     }
-
-    //get the currently selected track
-    auto track = conf->getCurrentTrack();
-    std::cout << "first location" << track.firstLocation() << "; last location:" << track.lastLocation() << std::endl;
     
     //create the simple simulator implementation
     std::unique_ptr<simulator> sim;
     try{
-        sim = std::make_unique<simulator>(track);
+        sim = std::make_unique<simulator>(conf);
     }catch(const std::exception& e){
         libtrainsim::core::Helper::print_exception(e);
         return -1;
