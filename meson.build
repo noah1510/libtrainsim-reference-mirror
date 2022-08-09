@@ -8,7 +8,8 @@ project(
         'b_coverage=false',
         'libtrainsim:build_full=true',
         'b_lto=true',
-        'b_pgo=generate'
+        'b_pgo=off',
+        'warning_level=3'
     ],
     version : '0.11.0',
     meson_version : '>= 0.54.0',
