@@ -96,6 +96,14 @@ bool simulator::updateImage(){
     base::time_si frametime = unit_cast(next_time-last_time, prefix::milli);
     statusWindow.appendFrametime(frametime);
     
+    auto renderTimes = video.getNewRendertimes();
+    if(renderTimes.has_value()){
+        auto& times = renderTimes.value();
+        for(auto time:times){
+            statusWindow.appendRendertime(time);
+        }
+    }
+    
     statusWindow.changePosition(phy.getLocation());
     statusWindow.changeEndPosition(track.lastLocation());
     
