@@ -50,7 +50,7 @@ simulator::simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> 
 bool simulator::updateImage(){
     //store the last location
     static auto last_position = track.firstLocation();
-    static auto last_time = libtrainsim::physics::now();
+    static auto last_time = libtrainsim::core::Helper::now();
     static bool firstCall = true;
 
     //update the physics
@@ -91,7 +91,7 @@ bool simulator::updateImage(){
     }
 
     //display statistics (speed, location, frametime, etc.)
-    auto next_time = libtrainsim::physics::now();
+    auto next_time = libtrainsim::core::Helper::now();
     
     base::time_si frametime = unit_cast(next_time-last_time, prefix::milli);
     statusWindow.appendFrametime(frametime);
