@@ -43,6 +43,9 @@ simulator::simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> 
     }catch(const std::exception& e){
         std::throw_with_nested(std::runtime_error("Could not create simulator window"));
     }
+    
+    SDL_initFramerate(&fpsControl);
+    SDL_setFramerate(&fpsControl, 60);
 
     hasError = false;
 }
@@ -112,6 +115,7 @@ bool simulator::updateImage(){
     statusWindow.setVelocity(phy.getVelocity());
 
     last_time = next_time;
+    SDL_framerateDelay(&fpsControl);
 
     return false;
 }

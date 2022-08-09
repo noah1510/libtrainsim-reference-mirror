@@ -10,6 +10,7 @@
 #include "helper.hpp"
 #include "statusDisplay.hpp"
 #include "simulator_config.hpp"
+#include "SDL2_framerate.h"
 #include <future>
 
 class simulator{
@@ -26,6 +27,7 @@ class simulator{
 
         libtrainsim::Video::videoManager video;
         libtrainsim::extras::statusDisplay statusWindow;
+        FPSmanager fpsControl;
 
     public:
         simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> settings);
