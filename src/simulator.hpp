@@ -25,7 +25,7 @@ class simulator{
         libtrainsim::physics phy;
 
         libtrainsim::Video::videoManager video;
-        libtrainsim::Video::statusDisplay statusWindow;
+        libtrainsim::extras::statusDisplay statusWindow;
 
     public:
         simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> settings);
