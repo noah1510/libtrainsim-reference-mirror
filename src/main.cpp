@@ -11,7 +11,9 @@
 int main(int argc, char **argv){
     
     //set a flag to display opengl errors on linux
-    setenv( "MESA_DEBUG", "", 0 );
+    #ifdef setenv
+        setenv( "MESA_DEBUG", "", 0 );
+    #endif
     
     //print the individual cmd arguments to make debugging them easier
     std::cout << "command line args:" << std::endl;
