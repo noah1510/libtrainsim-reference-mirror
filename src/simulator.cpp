@@ -12,6 +12,7 @@ using namespace libtrainsim::core;
 using namespace sakurajin::unit_system;
 using namespace sakurajin::unit_system::base::literals;
 using namespace sakurajin::unit_system::common::literals;
+using namespace std::literals;
 
 bool simulator::hasErrored(){
     return hasError.get();
@@ -43,9 +44,6 @@ simulator::simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> 
     }catch(const std::exception& e){
         std::throw_with_nested(std::runtime_error("Could not create simulator window"));
     }
-    
-    SDL_initFramerate(&fpsControl);
-    SDL_setFramerate(&fpsControl, 60);
 
     hasError = false;
 }
@@ -114,8 +112,11 @@ bool simulator::updateImage(){
     statusWindow.setSpeedLevel(Speedlevel);
     statusWindow.setVelocity(phy.getVelocity());
 
-    last_time = next_time;
-    SDL_framerateDelay(&fpsControl);
+    while(Helper::now()-last_time < 16ms){
+        std::this_thread::sleep_for(500us);
+    }
+    
+    last_time = Helper::now();
 
     return false;
 }

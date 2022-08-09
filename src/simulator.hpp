@@ -27,7 +27,6 @@ class simulator{
 
         libtrainsim::Video::videoManager video;
         libtrainsim::extras::statusDisplay statusWindow;
-        FPSmanager fpsControl;
 
     public:
         simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> settings);
