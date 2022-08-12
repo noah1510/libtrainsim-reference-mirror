@@ -29,7 +29,8 @@ simulator::simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> 
     track{settings->getCurrentTrack()},
     phy{settings->getCurrentTrack()},
     video{},
-    statusWindow{}
+    statusWindow{},
+    snow{settings->getShaderLocation(),settings->getShaderLocation()/"../extras/snowFx"}
 {
     //load video file
     try{
@@ -43,6 +44,14 @@ simulator::simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> 
         video.createWindow(track.getName(),settings->getShaderLocation());
     }catch(const std::exception& e){
         std::throw_with_nested(std::runtime_error("Could not create simulator window"));
+    }
+    
+    //overly the snow over the video
+    try{
+        auto tex = snow.getOutputTexture();
+        video.addTexture(tex);
+    }catch(...){
+        std::throw_with_nested(std::runtime_error("Could not attach snowflake texture to video class"));
     }
 
     hasError = false;
@@ -83,6 +92,7 @@ bool simulator::updateImage(){
     try{
         libtrainsim::Video::imguiHandler::startRender();
         
+        snow.updateTexture();
         video.refreshWindow();
         statusWindow.update();
         
@@ -110,7 +120,10 @@ bool simulator::updateImage(){
     
     statusWindow.setAcceleration(phy.getAcceleration());
     statusWindow.setSpeedLevel(Speedlevel);
-    statusWindow.setVelocity(phy.getVelocity());
+    
+    auto vel = phy.getVelocity();
+    snow.updateTrainSpeed(vel);
+    statusWindow.setVelocity(vel);
 
     while(Helper::now()-last_time < 16ms){
         std::this_thread::sleep_for(500us);

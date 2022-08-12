@@ -13,6 +13,8 @@
 #include "SDL2_framerate.h"
 #include <future>
 
+#include "snowFx.hpp"
+
 class simulator{
     private:
         guardedVar<unsigned int> currentFrame = guardedVar<unsigned int>(0);
@@ -27,6 +29,7 @@ class simulator{
 
         libtrainsim::Video::videoManager video;
         libtrainsim::extras::statusDisplay statusWindow;
+        libtrainsim::extras::snowFx snow;
 
     public:
         simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> settings);
