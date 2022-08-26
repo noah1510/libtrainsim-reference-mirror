@@ -90,6 +90,9 @@ int main(int argc, char **argv){
     
     //wait for the input to be finished
     //inputLoop.get();
+    
+    sim.reset();
+    input.reset();
 
     return 0;
 }
