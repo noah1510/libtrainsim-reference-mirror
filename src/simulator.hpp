@@ -25,11 +25,11 @@ class simulator{
         std::future<void> graphicsLoop;
 
         const libtrainsim::core::Track& track;
-        libtrainsim::physics phy;
+        std::unique_ptr<libtrainsim::physics> phy;
 
-        libtrainsim::Video::videoManager video;
-        libtrainsim::extras::statusDisplay statusWindow;
-        libtrainsim::extras::snowFx snow;
+        std::unique_ptr<libtrainsim::Video::videoManager> video;
+        std::unique_ptr<libtrainsim::extras::statusDisplay> statusWindow;
+        std::unique_ptr<libtrainsim::extras::snowFx> snow;
 
     public:
         simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> settings);

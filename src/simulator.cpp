@@ -22,34 +22,61 @@ simulator::~simulator(){
     hasError = true;
     //graphicsLoop.get();
     std::cout << std::endl;
+    std::cout << "closing the simulator" << std::endl;
+    
+    std::cout << "   destroying snowfx" << std::endl;
+    snow.reset();
+    std::cout << "   destroying status window" << std::endl;
+    statusWindow.reset();
+    std::cout << "   destroying videoManager" << std::endl;
+    video.reset();
+    std::cout << "   destroying physics" << std::endl;
+    phy.reset();
+    
     std::cout << "simulator has exited" << std::endl;
 }
 
-simulator::simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> settings):
-    track{settings->getCurrentTrack()},
-    phy{settings->getCurrentTrack()},
-    video{},
-    statusWindow{},
-    snow{settings->getShaderLocation(),settings->getShaderLocation()/"../extras/snowFx"}
-{
+simulator::simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> settings):track{settings->getCurrentTrack()}{
+    //load the physics
+    try{
+        phy = std::make_unique<libtrainsim::physics>(settings->getCurrentTrack());
+    }catch(...){
+        std::throw_with_nested(std::runtime_error("Error initializing physics"));
+    }
+    
     //load video file
     try{
-        video.load(track.getVideoFilePath());
+        video = std::make_unique<libtrainsim::Video::videoManager>();
+        video->load(track.getVideoFilePath());
     }catch(...){
         std::throw_with_nested(std::runtime_error("could not load video"));
     }
     
     //create the empty window
     try{
-        video.createWindow(track.getName(),settings->getShaderLocation());
+        video->createWindow(track.getName(),settings->getShaderLocation());
     }catch(const std::exception& e){
         std::throw_with_nested(std::runtime_error("Could not create simulator window"));
     }
     
+    //load the status display
+    try{
+        statusWindow = std::make_unique<libtrainsim::extras::statusDisplay>();
+    }catch(...){
+        std::throw_with_nested(std::runtime_error("Could not create status window"));
+    }
+    
+    //create the snow fx layer
+    try{
+        snow = std::make_unique<libtrainsim::extras::snowFx>(settings->getShaderLocation(),settings->getShaderLocation()/"../extras/snowFx");
+    }catch(...){
+        std::throw_with_nested(std::runtime_error("Could not load snow fx layer"));
+    }
+    
     //overly the snow over the video
     try{
-        auto tex = snow.getOutputTexture();
-        video.addTexture(tex);
+        auto tex = snow->getOutputTexture();
+        video->addTexture(tex);
     }catch(...){
         std::throw_with_nested(std::runtime_error("Could not attach snowflake texture to video class"));
     }
@@ -64,11 +91,11 @@ bool simulator::updateImage(){
     static bool firstCall = true;
 
     //update the physics
-    phy.tick();
-    auto loc = phy.getLocation();
+    phy->tick();
+    auto loc = phy->getLocation();
     
     //check if the simulator has to be closed
-    if(video.reachedEndOfFile() || phy.reachedEnd()){
+    if(video->reachedEndOfFile() || phy->reachedEnd()){
         end();
         return false;
     }
@@ -82,7 +109,7 @@ bool simulator::updateImage(){
 
         //if there is already a frame that is being rendered
         //then this call will buffer the furthest frame to be rendered
-        video.gotoFrame(frame_num);
+        video->gotoFrame(frame_num);
 
         //update the last position
         last_position = loc;
@@ -92,9 +119,9 @@ bool simulator::updateImage(){
     try{
         libtrainsim::Video::imguiHandler::startRender();
         
-        snow.updateTexture();
-        video.refreshWindow();
-        statusWindow.update();
+        snow->updateTexture();
+        video->refreshWindow();
+        statusWindow->update();
         
         libtrainsim::Video::imguiHandler::endRender();
     }catch(...){
@@ -105,25 +132,25 @@ bool simulator::updateImage(){
     auto next_time = libtrainsim::core::Helper::now();
     
     base::time_si frametime = unit_cast(next_time-last_time, prefix::milli);
-    statusWindow.appendFrametime(frametime);
+    statusWindow->appendFrametime(frametime);
     
-    auto renderTimes = video.getNewRendertimes();
+    auto renderTimes = video->getNewRendertimes();
     if(renderTimes.has_value()){
         auto& times = renderTimes.value();
         for(auto time:times){
-            statusWindow.appendRendertime(time);
+            statusWindow->appendRendertime(time);
         }
     }
     
-    statusWindow.changePosition(phy.getLocation());
-    statusWindow.changeEndPosition(track.lastLocation());
+    statusWindow->changePosition(phy->getLocation());
+    statusWindow->changeEndPosition(track.lastLocation());
     
-    statusWindow.setAcceleration(phy.getAcceleration());
-    statusWindow.setSpeedLevel(Speedlevel);
+    statusWindow->setAcceleration(phy->getAcceleration());
+    statusWindow->setSpeedLevel(Speedlevel);
     
-    auto vel = phy.getVelocity();
-    snow.updateTrainSpeed(vel);
-    statusWindow.setVelocity(vel);
+    auto vel = phy->getVelocity();
+    snow->updateTrainSpeed(vel);
+    statusWindow->setVelocity(vel);
 
     while(Helper::now()-last_time < 16ms){
         std::this_thread::sleep_for(500us);
@@ -135,7 +162,7 @@ bool simulator::updateImage(){
 }
 
 void simulator::emergencyBreak(){
-    phy.emergencyBreak();
+    phy->emergencyBreak();
 }
 
 void simulator::end(){
@@ -144,5 +171,5 @@ void simulator::end(){
 
 void simulator::serial_speedlvl(libtrainsim::core::input_axis Slvl){
     Speedlevel = Slvl;
-    phy.setSpeedlevel(Slvl);    
+    phy->setSpeedlevel(Slvl);    
 }
