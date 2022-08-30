@@ -54,7 +54,8 @@ simulator::simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> 
     
     //create the empty window
     try{
-        video->createWindow(track.getName(),settings->getShaderLocation());
+        video->createWindow(track.getName(),settings->getShaderLocation(), settings->getTextureLocation());
+        video->addTexture(libtrainsim::Video::imguiHandler::getDarkenTexture(20));
     }catch(const std::exception& e){
         std::throw_with_nested(std::runtime_error("Could not create simulator window"));
     }
