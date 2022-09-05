@@ -13,6 +13,7 @@ int main(int argc, char **argv){
     //set a flag to display opengl errors on linux
     #ifdef setenv
         setenv( "MESA_DEBUG", "", 0 );
+        setenv( "mesa_glthread", "true", 1 );
     #endif
     
     //print the individual cmd arguments to make debugging them easier
