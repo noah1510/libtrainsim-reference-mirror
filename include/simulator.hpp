@@ -22,7 +22,7 @@ class simulator{
 
         libtrainsim::core::input_axis Speedlevel;
 
-        std::future<void> graphicsLoop;
+        std::future<void> physicsLoop;
 
         const libtrainsim::core::Track& track;
         std::unique_ptr<libtrainsim::physics> phy;

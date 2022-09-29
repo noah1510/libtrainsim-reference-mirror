@@ -20,7 +20,12 @@ bool simulator::hasErrored(){
 
 simulator::~simulator(){
     hasError = true;
-    //graphicsLoop.get();
+    
+    if(physicsLoop.valid()){
+        physicsLoop.wait();
+        physicsLoop.get();
+    }
+    
     std::cout << std::endl;
     std::cout << "closing the simulator" << std::endl;
     
@@ -83,38 +88,40 @@ simulator::simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> 
     }
 
     hasError = false;
+    
+    physicsLoop = std::async(std::launch::async, [&](){
+        auto last_time = libtrainsim::core::Helper::now();
+        
+        do{
+            //update the physics
+            phy->tick();
+            auto loc = phy->getLocation();
+            
+            //check if the simulator has to be closed
+            if(video->reachedEndOfFile() || phy->reachedEnd()){
+                end();
+                continue;
+            }
+
+            //get the next frame that will be displayed
+            auto frame_num = track.data().getFrame(loc);
+
+            //if there is already a frame that is being rendered
+            //then this call will buffer the furthest frame to be rendered
+            video->gotoFrame(frame_num);
+            
+            if(libtrainsim::core::Helper::now() - last_time < 5ms){
+                std::this_thread::sleep_until(last_time + 5ms);
+            }
+            last_time = libtrainsim::core::Helper::now();
+            
+        }while(!hasErrored());
+    });
 }
 
 bool simulator::updateImage(){
-    //store the last location
-    static auto last_position = track.firstLocation();
+    //store the last last_time
     static auto last_time = libtrainsim::core::Helper::now();
-    static bool firstCall = true;
-
-    //update the physics
-    phy->tick();
-    auto loc = phy->getLocation();
-    
-    //check if the simulator has to be closed
-    if(video->reachedEndOfFile() || phy->reachedEnd()){
-        end();
-        return false;
-    }
-
-    //get a new frame if needed
-    if (last_position < loc || firstCall){
-        firstCall = false;
-
-        //get the next frame that will be displayed
-        auto frame_num = track.data().getFrame(loc);
-
-        //if there is already a frame that is being rendered
-        //then this call will buffer the furthest frame to be rendered
-        video->gotoFrame(frame_num);
-
-        //update the last position
-        last_position = loc;
-    }
     
     //actually render all of the windows
     try{
@@ -153,8 +160,8 @@ bool simulator::updateImage(){
     snow->updateTrainSpeed(vel);
     statusWindow->setVelocity(vel);
 
-    while(Helper::now()-last_time < 16ms){
-        std::this_thread::sleep_for(500us);
+    while(Helper::now()-last_time < 8ms){
+        std::this_thread::sleep_until(last_time+8ms);
     }
     
     last_time = Helper::now();
