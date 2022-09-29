@@ -1,11 +1,4 @@
 #include "simulator.hpp"
-#include <ctime>
-#include <future>
-#include <iomanip>
-#include <thread>
-#include <chrono>
-#include <ratio>
-#include <sstream>
 
 using namespace libtrainsim::core;
 
@@ -14,21 +7,17 @@ using namespace sakurajin::unit_system::base::literals;
 using namespace sakurajin::unit_system::common::literals;
 using namespace std::literals;
 
-bool simulator::hasErrored(){
-    return hasError.get();
-}
-
 simulator::~simulator(){
     hasError = true;
-    
-    if(physicsLoop.valid()){
-        physicsLoop.wait();
-        physicsLoop.get();
-    }
     
     std::cout << std::endl;
     std::cout << "closing the simulator" << std::endl;
     
+    std::cout << "   waiting for physics thread to end" << std::endl;
+    if(physicsLoop.valid()){
+        physicsLoop.wait();
+        physicsLoop.get();
+    }
     std::cout << "   destroying snowfx" << std::endl;
     snow.reset();
     std::cout << "   destroying status window" << std::endl;
@@ -89,6 +78,7 @@ simulator::simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> 
 
     hasError = false;
     
+    //start the physics and video decode updates in a separate thread
     physicsLoop = std::async(std::launch::async, [&](){
         auto last_time = libtrainsim::core::Helper::now();
         
@@ -100,7 +90,7 @@ simulator::simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> 
             //check if the simulator has to be closed
             if(video->reachedEndOfFile() || phy->reachedEnd()){
                 end();
-                continue;
+                return;
             }
 
             //get the next frame that will be displayed
@@ -144,8 +134,7 @@ bool simulator::updateImage(){
     
     auto renderTimes = video->getNewRendertimes();
     if(renderTimes.has_value()){
-        auto& times = renderTimes.value();
-        for(auto time:times){
+        for(auto time:renderTimes.value()){
             statusWindow->appendRendertime(time);
         }
     }
@@ -174,7 +163,13 @@ void simulator::emergencyBreak(){
 }
 
 void simulator::end(){
+    std::scoped_lock lock{errorMutex};
     hasError = true;
+}
+
+bool simulator::hasErrored(){
+    std::shared_lock lock{errorMutex};
+    return hasError;
 }
 
 void simulator::serial_speedlvl(libtrainsim::core::input_axis Slvl){

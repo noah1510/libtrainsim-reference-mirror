@@ -1,24 +1,16 @@
 #pragma once
 
-#include <filesystem>
-#include <shared_mutex>
-#include "guard.hpp"
-#include "video.hpp"
-#include "track_configuration.hpp"
-#include "physics.hpp"
-#include "serialcontrol.hpp"
-#include "helper.hpp"
-#include "statusDisplay.hpp"
 #include "simulator_config.hpp"
-#include "SDL2_framerate.h"
-#include <future>
+#include "video.hpp"
+#include "physics.hpp"
 
+#include "statusDisplay.hpp"
 #include "snowFx.hpp"
 
 class simulator{
     private:
-        guardedVar<unsigned int> currentFrame = guardedVar<unsigned int>(0);
-        guardedVar<bool> hasError = guardedVar<bool>(true);
+        bool hasError = true;
+        std::shared_mutex errorMutex;
 
         libtrainsim::core::input_axis Speedlevel;
 
