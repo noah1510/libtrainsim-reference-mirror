@@ -54,30 +54,11 @@ int main(int argc, char **argv){
         return -1;
     }
     
-    //handle all of the io code in a second thread
-    /*
-    auto inputLoop = std::async( [&](){
-        while(!sim->hasErrored()){
-            input->update();
-            sim->serial_speedlvl(input->getSpeedAxis());
-            
-            if(input->emergencyFlag()){
-                sim->emergencyBreak();
-            }
-            
-            if(input->closingFlag()){
-                std::cout << "Esc key is pressed by user. Stoppig the video" << std::endl;
-                sim->end();
-            }
-        }
-    } );
-    */
-    
     //update the output image in the current thread
     while(!sim->hasErrored()){
         input->update();
         sim->serial_speedlvl(input->getSpeedAxis());
-        
+            
         if(input->emergencyFlag()){
             sim->emergencyBreak();
         }
