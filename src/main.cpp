@@ -45,35 +45,56 @@ int main(int argc, char **argv){
         return 100;
     }
     
-    //create the simple simulator implementation
     std::unique_ptr<simulator> sim;
-    try{
-        sim = std::make_unique<simulator>(conf);
-    }catch(const std::exception& e){
-        libtrainsim::core::Helper::print_exception(e);
-        return -1;
-    }
-    
-    //update the output image in the current thread
-    while(!sim->hasErrored()){
-        input->update();
-        sim->serial_speedlvl(input->getSpeedAxis());
+    while(!input->closingFlag()){
+        if(sim == nullptr){
+            input->update();
+            //output main menu
+            libtrainsim::Video::imguiHandler::startRender();
+                ImGui::Begin("Main Menu");
+                
+                    auto trackCount = conf->getTrackCount();
+                    int selectedTrackID = static_cast<int>(conf->getCurrentTrackID());
+                    for(uint64_t i = 0; i < trackCount;i++){
+                        const auto& track = conf->getTrack(i);
+                        ImGui::RadioButton(track.getName().c_str(),&selectedTrackID,i);
+                    }
+                    
+                    if(ImGui::SmallButton("Start Simulator")){
+                        try{
+                            conf->selectTrack(selectedTrackID);
+                            sim = std::make_unique<simulator>(conf);
+                        }catch(const std::exception& e){
+                            libtrainsim::core::Helper::print_exception(e);
+                        }
+                    }
+                
+                ImGui::End();
+            libtrainsim::Video::imguiHandler::endRender();
             
-        if(input->emergencyFlag()){
-            sim->emergencyBreak();
+        }else{
+            //update the output image in the current thread
+            while(!sim->hasErrored()){
+                input->update();
+                sim->serial_speedlvl(input->getSpeedAxis());
+                    
+                if(input->emergencyFlag()){
+                    sim->emergencyBreak();
+                }
+                
+                if(input->closingFlag()){
+                    std::cout << "Esc key is pressed by user. Stoppig the video" << std::endl;
+                    sim->end();
+                }
+                sim->updateImage();
+            };
+            
+            sim.reset();
         }
         
-        if(input->closingFlag()){
-            std::cout << "Esc key is pressed by user. Stoppig the video" << std::endl;
-            sim->end();
-        }
-        sim->updateImage();
-    };
+        
+    }
     
-    //wait for the input to be finished
-    //inputLoop.get();
-    
-    sim.reset();
     input.reset();
 
     return 0;
