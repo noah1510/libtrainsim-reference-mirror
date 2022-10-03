@@ -57,6 +57,8 @@ simulator::simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> 
     //load the status display
     try{
         statusWindow = std::make_unique<libtrainsim::extras::statusDisplay>();
+        statusWindow->changeBeginPosition(track.firstLocation());
+        statusWindow->changeEndPosition(track.lastLocation());
     }catch(...){
         std::throw_with_nested(std::runtime_error("Could not create status window"));
     }
@@ -140,7 +142,6 @@ bool simulator::updateImage(){
     }
     
     statusWindow->changePosition(phy->getLocation());
-    statusWindow->changeEndPosition(track.lastLocation());
     
     statusWindow->setAcceleration(phy->getAcceleration());
     statusWindow->setSpeedLevel(Speedlevel);

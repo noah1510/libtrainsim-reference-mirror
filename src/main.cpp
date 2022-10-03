@@ -107,10 +107,17 @@ int main(int argc, char **argv){
                             ss << stops[i].name() << " ";
                             ImGui::RadioButton(ss.str().c_str(), &stopEnd, i);
                         }
+                        
+                        if(stopEnd <= stopBegin){
+                            stopEnd=stopBegin+1;
+                        }
                     ImGui::EndTable();
                     
                     if(ImGui::Button("Start Simulator")){
                         try{
+                            const auto& stops = conf->getCurrentTrack().getStops();
+                            conf->getTrack(selectedTrackID).setFirstLocation(stops[stopBegin].position());
+                            conf->getTrack(selectedTrackID).setLastLocation(stops[stopEnd].position());
                             sim = std::make_unique<simulator>(conf);
                         }catch(const std::exception& e){
                             libtrainsim::core::Helper::print_exception(e);
