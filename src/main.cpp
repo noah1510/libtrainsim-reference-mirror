@@ -46,23 +46,71 @@ int main(int argc, char **argv){
     }
     
     std::unique_ptr<simulator> sim;
+    int selectedTrackID = static_cast<int>(conf->getCurrentTrackID());
+    int lastTrackID = selectedTrackID;
+    int stopBegin = 0;
+    int stopEnd = conf->getCurrentTrack().getStops().size() - 1;
+    
     while(!input->closingFlag()){
         if(sim == nullptr){
             input->update();
             //output main menu
             libtrainsim::Video::imguiHandler::startRender();
-                ImGui::Begin("Main Menu");
-                
-                    auto trackCount = conf->getTrackCount();
-                    int selectedTrackID = static_cast<int>(conf->getCurrentTrackID());
-                    for(uint64_t i = 0; i < trackCount;i++){
-                        const auto& track = conf->getTrack(i);
-                        ImGui::RadioButton(track.getName().c_str(),&selectedTrackID,i);
-                    }
+                ImGui::Begin(
+                    "Main Menu", 
+                    NULL, 
+                    ImGuiWindowFlags_NoCollapse
+                );
+                    ImGui::BeginTable(
+                        "main menu cols", 
+                        3, 
+                        (ImGuiTableFlags_Resizable | ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_SizingStretchProp) & (~ImGuiTableFlags_Sortable)
+                    );
                     
-                    if(ImGui::SmallButton("Start Simulator")){
-                        try{
+                        //display the titles in row 0
+                        ImGui::TableNextColumn();
+                        ImGui::Text("Track selection");
+                        
+                        ImGui::TableNextColumn();
+                        ImGui::Text("Track begin selection");
+                        
+                        ImGui::TableNextColumn();
+                        ImGui::Text("Track end selection");
+                        
+                        //diplay the list of tracks
+                        ImGui::TableNextColumn();
+                        auto trackCount = conf->getTrackCount();
+                        for(uint64_t i = 0; i < trackCount;i++){
+                            const auto& track = conf->getTrack(i);
+                            ImGui::RadioButton(track.getName().c_str(),&selectedTrackID,i);
+                        }
+                        
+                        if(lastTrackID != selectedTrackID){
                             conf->selectTrack(selectedTrackID);
+                            stopEnd = conf->getCurrentTrack().getStops().size() - 1;
+                            lastTrackID = selectedTrackID;
+                        }
+                        
+                        //display where all of the stops where it is possible to begin
+                        ImGui::TableNextColumn();
+                        const auto& stops = conf->getCurrentTrack().getStops();
+                        for(uint64_t i = 0; i < stops.size()-1; i++){
+                            std::stringstream ss;
+                            ss << stops[i].name() << "";
+                            ImGui::RadioButton(ss.str().c_str(),&stopBegin,i);
+                        }
+                        
+                        //display where all of the stops where it is possible to end
+                        ImGui::TableNextColumn();
+                        for(uint64_t i = stopBegin+1; i < stops.size();i++){
+                            std::stringstream ss;
+                            ss << stops[i].name() << " ";
+                            ImGui::RadioButton(ss.str().c_str(), &stopEnd, i);
+                        }
+                    ImGui::EndTable();
+                    
+                    if(ImGui::Button("Start Simulator")){
+                        try{
                             sim = std::make_unique<simulator>(conf);
                         }catch(const std::exception& e){
                             libtrainsim::core::Helper::print_exception(e);
@@ -70,6 +118,8 @@ int main(int argc, char **argv){
                     }
                 
                 ImGui::End();
+                
+                
             libtrainsim::Video::imguiHandler::endRender();
             
         }else{
