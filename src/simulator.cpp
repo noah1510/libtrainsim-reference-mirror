@@ -49,7 +49,9 @@ simulator::simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> 
     //create the empty window
     try{
         video->createWindow(track.getName(),settings->getShaderLocation(), settings->getTextureLocation());
-        video->addTexture(libtrainsim::Video::imguiHandler::getDarkenTexture(20));
+        if(enableSnow){
+            video->addTexture(libtrainsim::Video::imguiHandler::getDarkenTexture(backgroundDim));
+        }
     }catch(const std::exception& e){
         std::throw_with_nested(std::runtime_error("Could not create simulator window"));
     }
@@ -72,8 +74,10 @@ simulator::simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> 
     
     //overly the snow over the video
     try{
-        auto tex = snow->getOutputTexture();
-        video->addTexture(tex);
+        if(enableSnow){
+            auto tex = snow->getOutputTexture();
+            video->addTexture(tex);
+        }
     }catch(...){
         std::throw_with_nested(std::runtime_error("Could not attach snowflake texture to video class"));
     }
@@ -119,7 +123,33 @@ bool simulator::updateImage(){
     try{
         libtrainsim::Video::imguiHandler::startRender();
         
-        snow->updateTexture();
+        auto lastSnowState = enableSnow;
+        auto lastDim = backgroundDim;
+        ImGui::Begin("simulator live settings");
+            ImGui::Checkbox("enable snow effects", &enableSnow);
+            ImGui::SliderInt("background dimming amount", &backgroundDim, 0, 100);
+        ImGui::End();
+
+        if(lastDim != backgroundDim){
+            try{
+                video->removeTexture(libtrainsim::Video::imguiHandler::getDarkenTexture(lastDim)->getName());
+                video->addTexture(libtrainsim::Video::imguiHandler::getDarkenTexture(backgroundDim));
+            }catch(...){}
+        }
+        
+        if(enableSnow != lastSnowState){
+            if(enableSnow){
+                video->addTexture(libtrainsim::Video::imguiHandler::getDarkenTexture(backgroundDim));
+                video->addTexture(snow->getOutputTexture());
+            }else{
+                video->removeTexture(libtrainsim::Video::imguiHandler::getDarkenTexture(backgroundDim)->getName());
+                video->removeTexture(snow->getOutputTexture()->getName());
+            }
+        }
+
+        if(enableSnow){
+            snow->updateTexture();
+        }
         video->refreshWindow();
         statusWindow->update();
         

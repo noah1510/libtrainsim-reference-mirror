@@ -23,6 +23,9 @@ class simulator{
         std::unique_ptr<libtrainsim::extras::statusDisplay> statusWindow;
         std::unique_ptr<libtrainsim::extras::snowFx> snow;
 
+        bool enableSnow = false;
+        int backgroundDim = 20;
+
     public:
         simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> settings);
         ~simulator();

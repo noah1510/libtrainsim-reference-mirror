@@ -49,7 +49,8 @@ int main(int argc, char **argv){
     int selectedTrackID = static_cast<int>(conf->getCurrentTrackID());
     int lastTrackID = selectedTrackID;
     int stopBegin = 0;
-    int stopEnd = conf->getCurrentTrack().getStops().size() - 1;
+    int stopEnd = 0;
+    std::vector<std::future<void>> asycTrackLoads;
     
     while(!input->closingFlag()){
         if(sim == nullptr){
@@ -86,35 +87,55 @@ int main(int argc, char **argv){
                         }
                         
                         if(lastTrackID != selectedTrackID){
-                            conf->selectTrack(selectedTrackID);
-                            stopEnd = conf->getCurrentTrack().getStops().size() - 1;
+                            asycTrackLoads.emplace_back(std::async(
+                                std::launch::async, 
+                                [&conf,&selectedTrackID](){
+                                    auto ID = selectedTrackID;
+                                    conf->getTrack(ID).ensure();
+                                })
+                            );
+                            stopEnd = conf->getTrack(selectedTrackID).getStops().size() - 1;
                             lastTrackID = selectedTrackID;
                         }
                         
                         //display where all of the stops where it is possible to begin
-                        ImGui::TableNextColumn();
-                        const auto& stops = conf->getCurrentTrack().getStops();
-                        for(uint64_t i = 0; i < stops.size()-1; i++){
-                            std::stringstream ss;
-                            ss << stops[i].name() << "";
-                            ImGui::RadioButton(ss.str().c_str(),&stopBegin,i);
-                        }
-                        
-                        //display where all of the stops where it is possible to end
-                        ImGui::TableNextColumn();
-                        for(uint64_t i = stopBegin+1; i < stops.size();i++){
-                            std::stringstream ss;
-                            ss << stops[i].name() << " ";
-                            ImGui::RadioButton(ss.str().c_str(), &stopEnd, i);
-                        }
-                        
-                        if(stopEnd <= stopBegin){
-                            stopEnd=stopBegin+1;
+                        try{
+                            ImGui::TableNextColumn();
+                            const auto& stops = conf->getTrack(selectedTrackID).getStops();
+                            for(uint64_t i = 0; i < stops.size()-1; i++){
+                                std::stringstream ss;
+                                ss << stops[i].name() << "";
+                                ImGui::RadioButton(ss.str().c_str(),&stopBegin,i);
+                            }
+                            
+                            //display where all of the stops where it is possible to end
+                            ImGui::TableNextColumn();
+                            for(uint64_t i = stopBegin+1; i < stops.size();i++){
+                                std::stringstream ss;
+                                ss << stops[i].name() << " ";
+                                ImGui::RadioButton(ss.str().c_str(), &stopEnd, i);
+                            }
+                            
+                            if(stopEnd <= stopBegin){
+                                stopEnd=stopBegin+1;
+                            }
+                        }catch(const std::exception& e){
+                            libtrainsim::core::Helper::print_exception(e);
                         }
                     ImGui::EndTable();
                     
                     if(ImGui::Button("Start Simulator")){
                         try{
+    
+                            //wait for all tracks to finish loading before starting the track
+                            for(auto& task:asycTrackLoads){
+                                if(task.valid()){
+                                    task.wait();
+                                    task.get();
+                                }
+                            }
+
+                            conf->selectTrack(selectedTrackID);
                             const auto& stops = conf->getCurrentTrack().getStops();
                             conf->getTrack(selectedTrackID).setFirstLocation(stops[stopBegin].position());
                             conf->getTrack(selectedTrackID).setLastLocation(stops[stopEnd].position());
@@ -152,6 +173,14 @@ int main(int argc, char **argv){
         
     }
     
+    //make sure no track is being loaded while the program closes
+    for(auto& task:asycTrackLoads){
+        if(task.valid()){
+            task.wait();
+            task.get();
+        }
+    }
+
     input.reset();
 
     return 0;
