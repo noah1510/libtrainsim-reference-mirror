@@ -7,8 +7,38 @@ using namespace sakurajin::unit_system::base::literals;
 using namespace sakurajin::unit_system::common::literals;
 using namespace std::literals;
 
+simulatorConfigMenu::simulatorConfigMenu ( simulator& disp ) : tabPage("simulator"), display{disp}{}
+
+void simulatorConfigMenu::displayContent() {
+    auto lastSnowState = display.enableSnow;
+    auto lastDim = display.backgroundDim;
+        
+    ImGui::Checkbox("enable snow effects", &display.enableSnow);
+    ImGui::SliderInt("background dimming amount", &display.backgroundDim, 0, 100);
+
+    if(lastDim != display.backgroundDim){
+        try{
+            display.video->removeTexture(libtrainsim::Video::imguiHandler::getDarkenTexture(lastDim)->getName());
+            display.video->addTexture(libtrainsim::Video::imguiHandler::getDarkenTexture(display.backgroundDim));
+        }catch(...){}
+    }
+    
+    if(display.enableSnow != lastSnowState){
+        if(display.enableSnow){
+            display.video->addTexture(libtrainsim::Video::imguiHandler::getDarkenTexture(display.backgroundDim));
+            display.video->addTexture(display.snow->getOutputTexture());
+        }else{
+            display.video->removeTexture(libtrainsim::Video::imguiHandler::getDarkenTexture(display.backgroundDim)->getName());
+            display.video->removeTexture(display.snow->getOutputTexture()->getName());
+        }
+    }
+}
+
+
 simulator::~simulator(){
     hasError = true;
+    
+    libtrainsim::Video::imguiHandler::removeSettingsTab("simulator");
     
     std::cout << std::endl;
     std::cout << "closing the simulator" << std::endl;
@@ -31,6 +61,9 @@ simulator::~simulator(){
 }
 
 simulator::simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> settings):track{settings->getCurrentTrack()}{
+    //add the settings page
+    libtrainsim::Video::imguiHandler::addSettingsTab(std::make_shared<simulatorConfigMenu>(*this));
+    
     //load the physics
     try{
         phy = std::make_unique<libtrainsim::physics>(settings->getCurrentTrack());
@@ -122,30 +155,6 @@ bool simulator::updateImage(){
     //actually render all of the windows
     try{
         libtrainsim::Video::imguiHandler::startRender();
-        
-        auto lastSnowState = enableSnow;
-        auto lastDim = backgroundDim;
-        ImGui::Begin("simulator live settings");
-            ImGui::Checkbox("enable snow effects", &enableSnow);
-            ImGui::SliderInt("background dimming amount", &backgroundDim, 0, 100);
-        ImGui::End();
-
-        if(lastDim != backgroundDim){
-            try{
-                video->removeTexture(libtrainsim::Video::imguiHandler::getDarkenTexture(lastDim)->getName());
-                video->addTexture(libtrainsim::Video::imguiHandler::getDarkenTexture(backgroundDim));
-            }catch(...){}
-        }
-        
-        if(enableSnow != lastSnowState){
-            if(enableSnow){
-                video->addTexture(libtrainsim::Video::imguiHandler::getDarkenTexture(backgroundDim));
-                video->addTexture(snow->getOutputTexture());
-            }else{
-                video->removeTexture(libtrainsim::Video::imguiHandler::getDarkenTexture(backgroundDim)->getName());
-                video->removeTexture(snow->getOutputTexture()->getName());
-            }
-        }
 
         if(enableSnow){
             snow->updateTexture();

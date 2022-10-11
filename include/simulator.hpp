@@ -7,7 +7,10 @@
 #include "statusDisplay.hpp"
 #include "snowFx.hpp"
 
+class simulatorConfigMenu;
+
 class simulator{
+    friend class simulatorConfigMenu;
     private:
         bool hasError = true;
         std::shared_mutex errorMutex;
@@ -36,4 +39,12 @@ class simulator{
         bool updateImage();
 
         void serial_speedlvl(libtrainsim::core::input_axis Slvl);
+};
+
+class simulatorConfigMenu : public libtrainsim::Video::tabPage {
+  private:
+    void displayContent() override;
+    simulator& display;
+  public:
+    simulatorConfigMenu(simulator& disp);
 };
