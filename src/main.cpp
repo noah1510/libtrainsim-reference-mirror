@@ -52,6 +52,13 @@ int main(int argc, char **argv){
     int stopEnd = 0;
     std::vector<std::future<void>> asycTrackLoads;
     
+    try{
+        libtrainsim::Video::imguiHandler::loadShaders(conf->getShaderLocation(),conf->getTextureLocation());
+    }catch(const std::exception& e){
+        libtrainsim::core::Helper::print_exception(e);
+        return 100;
+    }
+    
     while(!input->closingFlag()){
         if(sim == nullptr){
             input->update();

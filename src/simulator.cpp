@@ -97,24 +97,14 @@ simulator::simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> 
     }catch(...){
         std::throw_with_nested(std::runtime_error("Could not create status window"));
     }
-    
+
     //create the snow fx layer
     try{
         snow = std::make_unique<libtrainsim::extras::snowFx>(settings->getShaderLocation(),settings->getShaderLocation()/"../extras/snowFx");
     }catch(...){
-        std::throw_with_nested(std::runtime_error("Could not load snow fx layer"));
+        std::throw_with_nested(std::runtime_error("Could not load snowFx"));
     }
     
-    //overly the snow over the video
-    try{
-        if(enableSnow){
-            auto tex = snow->getOutputTexture();
-            video->addTexture(tex);
-        }
-    }catch(...){
-        std::throw_with_nested(std::runtime_error("Could not attach snowflake texture to video class"));
-    }
-
     hasError = false;
     
     //start the physics and video decode updates in a separate thread
