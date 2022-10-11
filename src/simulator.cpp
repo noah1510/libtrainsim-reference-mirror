@@ -14,7 +14,7 @@ void simulatorConfigMenu::displayContent() {
     auto lastDim = display.backgroundDim;
         
     ImGui::Checkbox("enable snow effects", &display.enableSnow);
-    ImGui::SliderInt("background dimming amount", &display.backgroundDim, 0, 100);
+    ImGui::SliderInt("background dimming amount", &display.backgroundDim, 0, 254);
 
     if(lastDim != display.backgroundDim){
         try{
