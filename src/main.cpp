@@ -101,14 +101,14 @@ int main(int argc, char **argv){
                                     conf->getTrack(ID).ensure();
                                 })
                             );
-                            stopEnd = conf->getTrack(selectedTrackID).getStops().size() - 1;
+                            stopEnd = conf->getTrack(selectedTrackID).getStations().size() - 1;
                             lastTrackID = selectedTrackID;
                         }
                         
                         //display where all of the stops where it is possible to begin
                         try{
                             ImGui::TableNextColumn();
-                            const auto& stops = conf->getTrack(selectedTrackID).getStops();
+                            const auto& stops = conf->getTrack(selectedTrackID).getStations();
                             for(uint64_t i = 0; i < stops.size()-1; i++){
                                 std::stringstream ss;
                                 ss << stops[i].name() << "";
@@ -143,7 +143,7 @@ int main(int argc, char **argv){
                             }
 
                             conf->selectTrack(selectedTrackID);
-                            const auto& stops = conf->getCurrentTrack().getStops();
+                            const auto& stops = conf->getCurrentTrack().getStations();
                             conf->getTrack(selectedTrackID).setFirstLocation(stops[stopBegin].position());
                             conf->getTrack(selectedTrackID).setLastLocation(stops[stopEnd].position());
                             sim = std::make_unique<simulator>(conf);
