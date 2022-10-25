@@ -25,6 +25,9 @@ int main(int argc, char **argv){
     //check if the libtrainsim version is high enough
     const libtrainsim::core::version required_version{0,11,0};
     assert((libtrainsim::core::lib_version >= required_version) && "libtrainsim version not high enogh!");
+    
+    //init the imgui handler
+    libtrainsim::Video::imguiHandler::init("libtrainsim reference implementation");
 
     //load the simulator configuration
     std::shared_ptr<libtrainsim::core::simulatorConfiguration> conf;
