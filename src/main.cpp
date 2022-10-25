@@ -49,7 +49,7 @@ int main(int argc, char **argv){
     int selectedTrackID = static_cast<int>(conf->getCurrentTrackID());
     int lastTrackID = selectedTrackID;
     int stopBegin = 0;
-    int stopEnd = 0;
+    int stopEnd = conf->getTrack(selectedTrackID).getStations().size() - 1;
     std::vector<std::future<void>> asycTrackLoads;
     
     try{
