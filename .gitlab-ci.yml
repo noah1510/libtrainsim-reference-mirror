@@ -3,6 +3,8 @@ image: git-registry.thm.de/bahn-simulator/docker-containers/libtrainsim:fedora
 build:
   stage: build
   script:
+    - git submodule init
+    - git submodule update
     - meson setup build
     - meson compile -C build
     - meson test -C build
