@@ -3,6 +3,7 @@
 #include "simulator_config.hpp"
 #include "video.hpp"
 #include "physics.hpp"
+#include "control.hpp"
 
 #include "statusDisplay.hpp"
 #include "snowFx.hpp"
@@ -25,6 +26,7 @@ class simulator{
         std::unique_ptr<libtrainsim::Video::videoManager> video;
         std::unique_ptr<libtrainsim::extras::statusDisplay> statusWindow;
         std::unique_ptr<libtrainsim::extras::snowFx> snow;
+        std::unique_ptr<libtrainsim::control::input_handler> input;
 
         bool enableSnow = false;
         int backgroundDim = 20;
@@ -36,7 +38,7 @@ class simulator{
         void end();
         
         void emergencyBreak();
-        bool updateImage();
+        void update();
 
         void serial_speedlvl(libtrainsim::core::input_axis Slvl);
 };

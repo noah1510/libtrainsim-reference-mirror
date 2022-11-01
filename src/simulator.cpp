@@ -56,17 +56,30 @@ simulator::~simulator(){
     video.reset();
     std::cout << "   destroying physics" << std::endl;
     phy.reset();
+    std::cout << "   destroying input_handler" << std::endl;
+    input.reset();
+    
+    int glErrorCode;
+    while((glErrorCode = glGetError()) != GL_NO_ERROR){
+        std::cout << "GL Error found: " << libtrainsim::Video::imguiHandler::decodeGLError(glErrorCode) << std::endl;
+    }
     
     std::cout << "simulator has exited" << std::endl;
 }
 
 simulator::simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> settings):track{settings->getCurrentTrack()}{
-    //add the settings page
-    libtrainsim::Video::imguiHandler::addSettingsTab(std::make_shared<simulatorConfigMenu>(*this));
+    //load the input system
+    try{
+        input = std::make_unique<libtrainsim::control::input_handler>(settings->getSerialConfigLocation());
+        libtrainsim::Video::imguiHandler::glErrorCheck();
+    }catch(...){
+        std::throw_with_nested(std::runtime_error("Cannot create input_handler"));
+    }
     
     //load the physics
     try{
         phy = std::make_unique<libtrainsim::physics>(settings->getCurrentTrack());
+        libtrainsim::Video::imguiHandler::glErrorCheck();
     }catch(...){
         std::throw_with_nested(std::runtime_error("Error initializing physics"));
     }
@@ -75,6 +88,7 @@ simulator::simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> 
     try{
         video = std::make_unique<libtrainsim::Video::videoManager>();
         video->load(track.getVideoFilePath());
+        libtrainsim::Video::imguiHandler::glErrorCheck();
     }catch(...){
         std::throw_with_nested(std::runtime_error("could not load video"));
     }
@@ -136,9 +150,12 @@ simulator::simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> 
             
         }while(!hasErrored());
     });
+    
+    //add the settings page after everything else has been fully added
+    libtrainsim::Video::imguiHandler::addSettingsTab(std::make_shared<simulatorConfigMenu>(*this));
 }
 
-bool simulator::updateImage(){
+void simulator::update(){
     //store the last last_time
     static auto last_time = libtrainsim::core::Helper::now();
     
@@ -184,8 +201,18 @@ bool simulator::updateImage(){
     }
     
     last_time = Helper::now();
-
-    return false;
+    
+    input->update();
+    serial_speedlvl(input->getSpeedAxis());
+        
+    if(input->emergencyFlag()){
+        emergencyBreak();
+    }
+    
+    if(input->closingFlag()){
+        std::cout << "Esc key is pressed by user. Stoppig the video" << std::endl;
+        end();
+    }
 }
 
 void simulator::emergencyBreak(){

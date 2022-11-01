@@ -1,5 +1,4 @@
 #include "video.hpp"
-#include "control.hpp"
 #include "simulator_config.hpp"
 
 #include <future>
@@ -7,6 +6,8 @@
 #include <cassert>
 
 #include "simulator.hpp"
+
+using namespace std::literals;
 
 int main(int argc, char **argv){
     
@@ -38,15 +39,6 @@ int main(int argc, char **argv){
         libtrainsim::core::Helper::print_exception(e);
         return 100;
     }
-   
-    //load the input handler with serial input if available
-    std::shared_ptr<libtrainsim::control::input_handler> input;
-    try{
-        input = std::make_shared<libtrainsim::control::input_handler>(conf->getSerialConfigLocation());
-    }catch(const std::exception& e){
-        libtrainsim::core::Helper::print_exception(e);
-        return 100;
-    }
     
     std::unique_ptr<simulator> sim;
     int selectedTrackID = static_cast<int>(conf->getCurrentTrackID());
@@ -54,6 +46,7 @@ int main(int argc, char **argv){
     int stopBegin = 0;
     int stopEnd = conf->getTrack(selectedTrackID).getStations().size() - 1;
     std::vector<std::future<void>> asycTrackLoads;
+    bool loadingSimulator = false;
     
     try{
         libtrainsim::Video::imguiHandler::loadShaders(conf->getShaderLocation(),conf->getTextureLocation());
@@ -62,9 +55,8 @@ int main(int argc, char **argv){
         return 100;
     }
     
-    while(!input->closingFlag()){
+    while(!libtrainsim::Video::imguiHandler::shouldTerminate()){
         if(sim == nullptr){
-            input->update();
             //output main menu
             libtrainsim::Video::imguiHandler::startRender();
                 ImGui::Begin(
