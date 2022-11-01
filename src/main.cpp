@@ -56,7 +56,7 @@ int main(int argc, char **argv){
     }
     
     while(!libtrainsim::Video::imguiHandler::shouldTerminate()){
-        if(sim == nullptr){
+        if(!loadingSimulator){
             //output main menu
             libtrainsim::Video::imguiHandler::startRender();
                 ImGui::Begin(
@@ -96,6 +96,8 @@ int main(int argc, char **argv){
                                     conf->getTrack(ID).ensure();
                                 })
                             );
+                            
+                            stopBegin = 0;
                             stopEnd = conf->getTrack(selectedTrackID).getStations().size() - 1;
                             lastTrackID = selectedTrackID;
                         }
@@ -126,25 +128,10 @@ int main(int argc, char **argv){
                         }
                     ImGui::EndTable();
                     
+                    //Pressing the button switches to the other half of the if.
+                    //This prevents double pressing the start button which
                     if(ImGui::Button("Start Simulator")){
-                        try{
-    
-                            //wait for all tracks to finish loading before starting the track
-                            for(auto& task:asycTrackLoads){
-                                if(task.valid()){
-                                    task.wait();
-                                    task.get();
-                                }
-                            }
-
-                            conf->selectTrack(selectedTrackID);
-                            const auto& stops = conf->getCurrentTrack().getStations();
-                            conf->getTrack(selectedTrackID).setFirstLocation(stops[stopBegin].position());
-                            conf->getTrack(selectedTrackID).setLastLocation(stops[stopEnd].position());
-                            sim = std::make_unique<simulator>(conf);
-                        }catch(const std::exception& e){
-                            libtrainsim::core::Helper::print_exception(e);
-                        }
+                        loadingSimulator = true;
                     }
                 
                 ImGui::End();
@@ -153,23 +140,55 @@ int main(int argc, char **argv){
             libtrainsim::Video::imguiHandler::endRender();
             
         }else{
-            //update the output image in the current thread
-            while(!sim->hasErrored()){
-                input->update();
-                sim->serial_speedlvl(input->getSpeedAxis());
-                    
-                if(input->emergencyFlag()){
-                    sim->emergencyBreak();
-                }
+            //display the loading screen before catually starting the load
+            libtrainsim::Video::imguiHandler::startRender();
                 
-                if(input->closingFlag()){
-                    std::cout << "Esc key is pressed by user. Stoppig the video" << std::endl;
-                    sim->end();
+                ImGui::Text("Loading simulator...");
+            
+            libtrainsim::Video::imguiHandler::endRender();
+            
+            //start loading the simulator during the next render cycle
+            //while the code is waiting for the load to finish the loading screen is being displayed
+            libtrainsim::Video::imguiHandler::startRender();
+                
+                ImGui::Text("Loading simulator...");
+                
+                try{
+                    //clear all gl errors before loading the sim
+                    int glErrorCode;
+                    while((glErrorCode = glGetError()) != GL_NO_ERROR){
+                        std::cout << "GL Error found: " << libtrainsim::Video::imguiHandler::decodeGLError(glErrorCode) << std::endl;
+                    }
+                    
+                    //wait for all tracks to finish loading before starting the track
+                    for(auto& task:asycTrackLoads){
+                        if(task.valid()){
+                            task.wait();
+                            task.get();
+                        }
+                    }
+                    
+                    //actually select the selected track
+                    conf->selectTrack(selectedTrackID);
+                    const auto& stops = conf->getCurrentTrack().getStations();
+                    conf->getTrack(selectedTrackID).setFirstLocation(stops[stopBegin].position());
+                    conf->getTrack(selectedTrackID).setLastLocation(stops[stopEnd].position());
+                    sim = std::make_unique<simulator>(conf);
+                }catch(const std::exception& e){
+                    libtrainsim::core::Helper::print_exception(e);
+                    break;
                 }
-                sim->updateImage();
+            
+            libtrainsim::Video::imguiHandler::endRender();
+            
+            //update the simulator in the current thread
+            while(!sim->hasErrored()){
+                sim->update();
             };
             
             sim.reset();
+            loadingSimulator = false;
+            
         }
         
         
@@ -182,8 +201,6 @@ int main(int argc, char **argv){
             task.get();
         }
     }
-
-    input.reset();
 
     return 0;
 }
