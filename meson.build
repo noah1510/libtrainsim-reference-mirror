@@ -35,6 +35,11 @@ sources = [
     'src/simulator.cpp',
 ]
 
+#try to check if all individual shader files are valid
+if not get_option('no-data')
+    subdir('data/production_data/shaders')
+endif
+
 if target_machine.system() == 'emscripten'
     executable(
         'simulator', 

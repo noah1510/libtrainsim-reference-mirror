@@ -1,32 +1,33 @@
 #pragma once
 
-#include <filesystem>
-#include <shared_mutex>
-#include "guard.hpp"
-#include "video.hpp"
-#include "track_configuration.hpp"
-#include "physics.hpp"
-#include "serialcontrol.hpp"
-#include "helper.hpp"
-#include "statusDisplay.hpp"
 #include "simulator_config.hpp"
-#include "SDL2_framerate.h"
-#include <future>
+#include "video.hpp"
+#include "physics.hpp"
+
+#include "statusDisplay.hpp"
+#include "snowFx.hpp"
+
+class simulatorConfigMenu;
 
 class simulator{
+    friend class simulatorConfigMenu;
     private:
-        guardedVar<unsigned int> currentFrame = guardedVar<unsigned int>(0);
-        guardedVar<bool> hasError = guardedVar<bool>(true);
+        bool hasError = true;
+        std::shared_mutex errorMutex;
 
         libtrainsim::core::input_axis Speedlevel;
 
-        std::future<void> graphicsLoop;
+        std::future<void> physicsLoop;
 
         const libtrainsim::core::Track& track;
-        libtrainsim::physics phy;
+        std::unique_ptr<libtrainsim::physics> phy;
 
-        libtrainsim::Video::videoManager video;
-        libtrainsim::extras::statusDisplay statusWindow;
+        std::unique_ptr<libtrainsim::Video::videoManager> video;
+        std::unique_ptr<libtrainsim::extras::statusDisplay> statusWindow;
+        std::unique_ptr<libtrainsim::extras::snowFx> snow;
+
+        bool enableSnow = false;
+        int backgroundDim = 20;
 
     public:
         simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> settings);
@@ -38,4 +39,12 @@ class simulator{
         bool updateImage();
 
         void serial_speedlvl(libtrainsim::core::input_axis Slvl);
+};
+
+class simulatorConfigMenu : public libtrainsim::Video::tabPage {
+  private:
+    void displayContent() override;
+    simulator& display;
+  public:
+    simulatorConfigMenu(simulator& disp);
 };
