@@ -114,7 +114,7 @@ simulator::simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> 
 
     //create the snow fx layer
     try{
-        snow = std::make_unique<libtrainsim::extras::snowFx>(settings->getShaderLocation(),settings->getShaderLocation()/"../extras/snowFx");
+        snow = std::make_unique<libtrainsim::extras::snowFx>(settings);
     }catch(...){
         std::throw_with_nested(std::runtime_error("Could not load snowFx"));
     }
