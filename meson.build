@@ -15,11 +15,14 @@ project(
     meson_version : '>= 0.54.0',
 )
 
-#make the best out of the cpu arch
-march = get_option('march')
+compiler = meson.get_compiler('cpp')
+if compiler.get_id() != 'msvc'
+    #make the best out of the cpu arch
+    march = get_option('march')
 
-add_global_arguments('-march=' + march, language : 'c')
-add_global_arguments('-march=' + march, language : 'cpp')
+    add_global_arguments('-march=' + march, language : 'c')
+    add_global_arguments('-march=' + march, language : 'cpp')
+endif
 
 #the minimum required libtrainsim version
 libtrainsim_version = meson.project_version()
