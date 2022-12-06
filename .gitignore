@@ -22,3 +22,5 @@ libtrainsim_ppc64el*.txt
 *.kdev4
 
 imgui.ini
+
+.idea/

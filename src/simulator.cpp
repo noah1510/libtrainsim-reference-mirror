@@ -3,8 +3,7 @@
 using namespace libtrainsim::core;
 
 using namespace sakurajin::unit_system;
-using namespace sakurajin::unit_system::base::literals;
-using namespace sakurajin::unit_system::common::literals;
+using namespace sakurajin::unit_system::literals;
 using namespace std::literals;
 
 simulatorConfigMenu::simulatorConfigMenu ( simulator& disp ) : tabPage("simulator"), display{disp}{}
@@ -177,7 +176,7 @@ void simulator::update(){
     //display statistics (speed, location, frametime, etc.)
     auto next_time = libtrainsim::core::Helper::now();
     
-    base::time_si frametime = unit_cast(next_time-last_time, prefix::milli);
+    time_si frametime = unit_cast(next_time-last_time, multiplier(std::milli::type{}));
     statusWindow->appendFrametime(frametime);
     
     auto renderTimes = video->getNewRendertimes();
