@@ -41,12 +41,8 @@ int main(int argc, char **argv){
     }
     
     std::unique_ptr<simulator> sim;
-    int selectedTrackID = static_cast<int>(conf->getCurrentTrackID());
-    int lastTrackID = selectedTrackID;
-    int stopBegin = 0;
-    int stopEnd = conf->getTrack(selectedTrackID).getStations().size() - 1;
-    std::vector<std::future<void>> asycTrackLoads;
     bool loadingSimulator = false;
+    std::unique_ptr<mainMenu> menu = std::make_unique<mainMenu>(conf);
     
     try{
         libtrainsim::Video::imguiHandler::loadShaders(conf->getShaderLocation(),conf->getTextureLocation());
@@ -57,87 +53,13 @@ int main(int argc, char **argv){
     
     while(!libtrainsim::Video::imguiHandler::shouldTerminate()){
         if(!loadingSimulator){
-            //output main menu
             libtrainsim::Video::imguiHandler::startRender();
-                ImGui::Begin(
-                    "Main Menu", 
-                    NULL, 
-                    ImGuiWindowFlags_NoCollapse
-                );
-                    ImGui::BeginTable(
-                        "main menu cols", 
-                        3, 
-                        (ImGuiTableFlags_Resizable | ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_SizingStretchProp) & (~ImGuiTableFlags_Sortable)
-                    );
-                    
-                        //display the titles in row 0
-                        ImGui::TableNextColumn();
-                        ImGui::Text("Track selection");
-                        
-                        ImGui::TableNextColumn();
-                        ImGui::Text("Track begin selection");
-                        
-                        ImGui::TableNextColumn();
-                        ImGui::Text("Track end selection");
-                        
-                        //diplay the list of tracks
-                        ImGui::TableNextColumn();
-                        auto trackCount = conf->getTrackCount();
-                        for(uint64_t i = 0; i < trackCount;i++){
-                            const auto& track = conf->getTrack(i);
-                            ImGui::RadioButton(track.getName().c_str(),&selectedTrackID,i);
-                        }
-                        
-                        if(lastTrackID != selectedTrackID){
-                            asycTrackLoads.emplace_back(std::async(
-                                std::launch::async, 
-                                [&conf,&selectedTrackID](){
-                                    auto ID = selectedTrackID;
-                                    conf->getTrack(ID).ensure();
-                                })
-                            );
-                            
-                            stopBegin = 0;
-                            stopEnd = conf->getTrack(selectedTrackID).getStations().size() - 1;
-                            lastTrackID = selectedTrackID;
-                        }
-                        
-                        //display where all of the stops where it is possible to begin
-                        try{
-                            ImGui::TableNextColumn();
-                            const auto& stops = conf->getTrack(selectedTrackID).getStations();
-                            for(uint64_t i = 0; i < stops.size()-1; i++){
-                                std::stringstream ss;
-                                ss << stops[i].name() << "";
-                                ImGui::RadioButton(ss.str().c_str(),&stopBegin,i);
-                            }
-                            
-                            //display where all of the stops where it is possible to end
-                            ImGui::TableNextColumn();
-                            for(uint64_t i = stopBegin+1; i < stops.size();i++){
-                                std::stringstream ss;
-                                ss << stops[i].name() << " ";
-                                ImGui::RadioButton(ss.str().c_str(), &stopEnd, i);
-                            }
-                            
-                            if(stopEnd <= stopBegin){
-                                stopEnd=stopBegin+1;
-                            }
-                        }catch(const std::exception& e){
-                            libtrainsim::core::Helper::print_exception(e);
-                        }
-                    ImGui::EndTable();
-                    
-                    //Pressing the button switches to the other half of the if.
-                    //This prevents double pressing the start button which
-                    if(ImGui::Button("Start Simulator")){
-                        loadingSimulator = true;
-                    }
-                
-                ImGui::End();
-                
-                
+            
+            menu->draw();
+            loadingSimulator = menu->shouldStart();
+            
             libtrainsim::Video::imguiHandler::endRender();
+                
             
         }else{
             //display the loading screen before catually starting the load
@@ -160,13 +82,11 @@ int main(int argc, char **argv){
                         std::cout << "GL Error found: " << libtrainsim::Video::imguiHandler::decodeGLError(glErrorCode) << std::endl;
                     }
                     
-                    //wait for all tracks to finish loading before starting the track
-                    for(auto& task:asycTrackLoads){
-                        if(task.valid()){
-                            task.wait();
-                            task.get();
-                        }
-                    }
+                    menu->finishTrackLoad();
+                    auto selectedTrackID = menu->getSelectedTrack();
+                    auto [stopBegin, stopEnd] = menu->getStopIDs();
+                    menu.reset();
+                    menu = nullptr;
                     
                     //actually select the selected track
                     conf->selectTrack(selectedTrackID);
@@ -188,18 +108,10 @@ int main(int argc, char **argv){
             
             sim.reset();
             loadingSimulator = false;
+            menu = std::make_unique<mainMenu>(conf);
             
         }
         
-        
-    }
-    
-    //make sure no track is being loaded while the program closes
-    for(auto& task:asycTrackLoads){
-        if(task.valid()){
-            task.wait();
-            task.get();
-        }
     }
 
     return 0;

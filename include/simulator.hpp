@@ -10,6 +10,26 @@
 
 class simulatorConfigMenu;
 
+class mainMenu:public libtrainsim::Video::window{
+    private:
+      std::shared_ptr<libtrainsim::core::simulatorConfiguration> conf;
+      int selectedTrackID;
+      int lastTrackID;
+      int stopBegin;
+      int stopEnd;
+      bool ShouldStart = false;
+      std::vector<std::future<void>> asycTrackLoads;
+    public:
+      mainMenu(std::shared_ptr<libtrainsim::core::simulatorConfiguration> _conf);
+      ~mainMenu();
+      
+      void drawContent() override;
+      bool shouldStart() const;
+      void finishTrackLoad();
+      int getSelectedTrack() const;
+      std::pair<int, int> getStopIDs() const;
+};
+
 class simulator{
     friend class simulatorConfigMenu;
     private:
