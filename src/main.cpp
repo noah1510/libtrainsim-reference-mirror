@@ -44,13 +44,6 @@ int main(int argc, char **argv){
     bool loadingSimulator = false;
     std::unique_ptr<mainMenu> menu = std::make_unique<mainMenu>(conf);
     
-    try{
-        libtrainsim::Video::imguiHandler::loadShaders(conf->getShaderLocation(),conf->getTextureLocation());
-    }catch(const std::exception& e){
-        libtrainsim::core::Helper::print_exception(e);
-        return 100;
-    }
-    
     while(!libtrainsim::Video::imguiHandler::shouldTerminate()){
         if(!loadingSimulator){
             libtrainsim::Video::imguiHandler::startRender();
