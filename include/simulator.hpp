@@ -19,11 +19,11 @@ class mainMenu:public libtrainsim::Video::window{
       int stopEnd;
       bool ShouldStart = false;
       std::vector<std::future<void>> asycTrackLoads;
+      void content() override;
     public:
       mainMenu(std::shared_ptr<libtrainsim::core::simulatorConfiguration> _conf);
       ~mainMenu();
       
-      void drawContent() override;
       bool shouldStart() const;
       void finishTrackLoad();
       int getSelectedTrack() const;
@@ -65,7 +65,7 @@ class simulator{
 
 class simulatorConfigMenu : public libtrainsim::Video::tabPage {
   private:
-    void displayContent() override;
+    void content() override;
     simulator& display;
   public:
     simulatorConfigMenu(simulator& disp);

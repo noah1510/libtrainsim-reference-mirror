@@ -8,7 +8,7 @@ using namespace std::literals;
 
 simulatorConfigMenu::simulatorConfigMenu ( simulator& disp ) : tabPage("simulator"), display{disp}{}
 
-void simulatorConfigMenu::displayContent() {
+void simulatorConfigMenu::content() {
     auto lastSnowState = display.enableSnow;
     auto lastDim = display.backgroundDim;
         
@@ -72,7 +72,7 @@ std::pair<int, int> mainMenu::getStopIDs() const {
 }
 
 
-void mainMenu::drawContent() {
+void mainMenu::content() {
     if(ImGui::BeginTable(
         "main menu cols", 
         3, 
@@ -280,7 +280,7 @@ void simulator::update(){
             snow->updateTexture();
         }
         video->refreshWindow();
-        statusWindow->update();
+        statusWindow->draw();
         
         libtrainsim::Video::imguiHandler::endRender();
     }catch(...){
