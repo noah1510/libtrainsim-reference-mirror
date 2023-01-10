@@ -9,7 +9,7 @@
 
 using namespace std::literals;
 
-int main(int argc, char **argv){
+int main(int argc, char* argv[]){
     
     //set a flag to display opengl errors on linux
     #ifdef setenv
@@ -31,12 +31,27 @@ int main(int argc, char **argv){
     libtrainsim::Video::imguiHandler::init("libtrainsim reference implementation");
 
     //load the simulator configuration
-    std::shared_ptr<libtrainsim::core::simulatorConfiguration> conf;
-    try{
-        std::filesystem::path config_loc = argc > 1 ? argv[1] : "data/production_data/simulator.json";
-        conf = std::make_shared<libtrainsim::core::simulatorConfiguration>(config_loc, true);
-    }catch(const std::exception& e){
-        libtrainsim::core::Helper::print_exception(e);
+    std::unique_ptr<configSelectionWindow> configSelection = nullptr;
+    if(argc > 1){
+        configSelection = std::make_unique<configSelectionWindow>(argv[1]);
+    }else{
+        configSelection = std::make_unique<configSelectionWindow>();
+    }
+    
+    do{
+        libtrainsim::Video::imguiHandler::startRender();
+            
+        configSelection->draw();
+        
+        libtrainsim::Video::imguiHandler::endRender();
+
+        if(libtrainsim::Video::imguiHandler::shouldTerminate()){
+            return 0;
+        }
+    }while(!configSelection->closeWindow());
+
+    auto conf = configSelection->getConfig();
+    if(conf == nullptr){
         return 100;
     }
     

@@ -6,6 +6,44 @@ using namespace sakurajin::unit_system;
 using namespace sakurajin::unit_system::literals;
 using namespace std::literals;
 
+configSelectionWindow::configSelectionWindow():window{"configFileSelection"}{
+    try{
+        auto texpath = "application-json.png";
+        fileTex = std::make_shared<libtrainsim::Video::texture>(texpath);
+    }catch(...){
+        std::throw_with_nested(std::runtime_error("cannot load file texture"));
+    }
+    closableWindow = false;
+    showWindow = true;
+}
+
+configSelectionWindow::configSelectionWindow(std::string initialLocation):configSelectionWindow(){
+    try{
+        conf = std::make_shared<libtrainsim::core::simulatorConfiguration>(initialLocation, true);
+        close = true;
+    }catch(const std::exception& e){
+        libtrainsim::core::Helper::print_exception(e);
+        conf = nullptr;
+        close = false;
+        return;
+    }
+}
+
+std::shared_ptr<libtrainsim::core::simulatorConfiguration> configSelectionWindow::getConfig(){
+    return conf;
+}
+
+bool configSelectionWindow::closeWindow() const{
+    return close;
+}
+
+void configSelectionWindow::content(){
+    ImGui::Text("select the path for the simulator config.");
+    ImGui::Text("you can drag a file below here to load it.");
+
+    //add nfd file selector
+}
+
 simulatorConfigMenu::simulatorConfigMenu ( simulator& disp ) : tabPage("simulator"), display{disp}{}
 
 void simulatorConfigMenu::content() {

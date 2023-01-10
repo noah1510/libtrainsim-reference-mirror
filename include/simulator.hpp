@@ -8,26 +8,39 @@
 #include "statusDisplay.hpp"
 #include "snowFx.hpp"
 
+class configSelectionWindow :public libtrainsim::Video::window{
+  private:
+    void content() override;
+    bool close = false;
+    std::shared_ptr<libtrainsim::Video::texture> fileTex = nullptr;
+    std::shared_ptr<libtrainsim::core::simulatorConfiguration> conf = nullptr;
+  public:
+    configSelectionWindow();
+    configSelectionWindow(std::string initialLocation);
+    std::shared_ptr<libtrainsim::core::simulatorConfiguration> getConfig();
+    bool closeWindow() const;
+};
+
 class simulatorConfigMenu;
 
 class mainMenu:public libtrainsim::Video::window{
-    private:
-      std::shared_ptr<libtrainsim::core::simulatorConfiguration> conf;
-      int selectedTrackID;
-      int lastTrackID;
-      int stopBegin;
-      int stopEnd;
-      bool ShouldStart = false;
-      std::vector<std::future<void>> asycTrackLoads;
-      void content() override;
-    public:
-      mainMenu(std::shared_ptr<libtrainsim::core::simulatorConfiguration> _conf);
-      ~mainMenu();
-      
-      bool shouldStart() const;
-      void finishTrackLoad();
-      int getSelectedTrack() const;
-      std::pair<int, int> getStopIDs() const;
+  private:
+    std::shared_ptr<libtrainsim::core::simulatorConfiguration> conf;
+    int selectedTrackID;
+    int lastTrackID;
+    int stopBegin;
+    int stopEnd;
+    bool ShouldStart = false;
+    std::vector<std::future<void>> asycTrackLoads;
+    void content() override;
+  public:
+    mainMenu(std::shared_ptr<libtrainsim::core::simulatorConfiguration> _conf);
+    ~mainMenu();
+    
+    bool shouldStart() const;
+    void finishTrackLoad();
+    int getSelectedTrack() const;
+    std::pair<int, int> getStopIDs() const;
 };
 
 class simulator{

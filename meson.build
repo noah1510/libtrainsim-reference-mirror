@@ -22,6 +22,19 @@ if compiler.get_id() != 'msvc'
 
     add_global_arguments('-march=' + march, language : 'c')
     add_global_arguments('-march=' + march, language : 'cpp')
+else
+    vcpkg_path = get_option('vcpkg-path')
+    if vcpkg_path == ''
+        error('vcpkg-path is needed to compile with msvc')
+    endif
+
+    packagePath = vcpkg_path / 'installed/x64-windows'
+    sdlMainLinkArg = '-l'+packagePath / 'lib/manual-link/SDL2main'
+    add_global_link_arguments(sdlMainLinkArg, language : 'c')
+    add_global_link_arguments(sdlMainLinkArg, language : 'cpp')
+
+    #mark all dll to be installed
+    install_subdir(packagePath, install_dir:get_option('prefix'), strip_directory: true)
 endif
 
 #the minimum required libtrainsim version
@@ -42,7 +55,9 @@ sources = [
 if not get_option('no-data')
     subdir('data/production_data/shaders')
 endif
-    
+
+install_data('application-json.png',install_dir:get_option('bindir'))
+
 executable(
     'simulator', 
     sources,
@@ -50,9 +65,8 @@ executable(
     dependencies: deps,
     win_subsystem: 'windows',
     install : true,
-    install_dir : get_option('datadir') / 'libtrainsim',
 )
-    
+
 
 if not get_option('no-data')
     install_subdir('data', install_dir : get_option('datadir') / 'libtrainsim')
