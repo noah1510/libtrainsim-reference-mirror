@@ -42,28 +42,17 @@ sources = [
 if not get_option('no-data')
     subdir('data/production_data/shaders')
 endif
-
-if target_machine.system() == 'emscripten'
-    executable(
-        'simulator', 
-        sources,
-        include_directories : incdir,
-        dependencies: deps,
-        install : true,
-        install_dir : get_option('datadir') / 'libtrainsim',
-    )
-else
     
-    executable(
-        'simulator', 
-        sources,
-        include_directories : incdir,
-        dependencies: deps,
-        install : true,
-        install_dir : get_option('datadir') / 'libtrainsim',
-    )
+executable(
+    'simulator', 
+    sources,
+    include_directories : incdir,
+    dependencies: deps,
+    win_subsystem: 'windows',
+    install : true,
+    install_dir : get_option('datadir') / 'libtrainsim',
+)
     
-endif
 
 if not get_option('no-data')
     install_subdir('data', install_dir : get_option('datadir') / 'libtrainsim')
