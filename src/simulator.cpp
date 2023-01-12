@@ -8,7 +8,7 @@ using namespace std::literals;
 
 configSelectionWindow::configSelectionWindow():window{"configFileSelection"}{
     try{
-        auto texpath = "application-json.png";
+        std::filesystem::path texpath = "application-json.png";
         fileTex = std::make_shared<libtrainsim::Video::texture>(texpath);
     }catch(...){
         std::throw_with_nested(std::runtime_error("cannot load file texture"));
