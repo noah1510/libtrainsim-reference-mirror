@@ -38,10 +38,21 @@ bool configSelectionWindow::closeWindow() const{
 }
 
 void configSelectionWindow::content(){
-    ImGui::Text("select the path for the simulator config.");
-    ImGui::Text("you can drag a file below here to load it.");
-
-    //add nfd file selector
+    if(ImGui::Button("press here to select a configuration file.")){
+        static NFD::UniquePathN outPath = nullptr;
+        auto res = NFD::OpenDialog(outPath);
+        if(res == NFD_OKAY){
+            try{
+                conf = std::make_shared<libtrainsim::core::simulatorConfiguration>(outPath.get(), true);
+                close = true;
+            }catch(const std::exception& e){
+                libtrainsim::core::Helper::print_exception(e);
+                conf = nullptr;
+                close = false;
+                return;
+            }
+        }
+    }
 }
 
 simulatorConfigMenu::simulatorConfigMenu ( simulator& disp ) : tabPage("simulator"), display{disp}{}
