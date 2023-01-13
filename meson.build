@@ -12,7 +12,7 @@ project(
         'warning_level=3'
     ],
     version : '0.11.0',
-    meson_version : '>= 0.54.0',
+    meson_version : '>= 0.56.0',
 )
 
 compiler = meson.get_compiler('cpp')
