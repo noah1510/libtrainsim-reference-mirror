@@ -325,11 +325,12 @@ void simulator::update(){
     try{
         libtrainsim::Video::imguiHandler::startRender();
 
+        statusWindow->draw();
+        
         if(enableSnow){
             snow->updateTexture();
         }
         video->refreshWindow();
-        statusWindow->draw();
         
         libtrainsim::Video::imguiHandler::endRender();
     }catch(...){
