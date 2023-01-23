@@ -111,7 +111,13 @@ int main(int argc, char* argv[]){
             
             //update the simulator in the current thread
             while(!sim->hasErrored()){
-                sim->update();
+                try{
+                    sim->update();
+                }catch(const std::exception& e){
+                    libtrainsim::core::Helper::print_exception(e);
+                    sim->end();
+                };
+
             };
             
             sim.reset();

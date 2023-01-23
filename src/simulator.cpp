@@ -63,13 +63,6 @@ void simulatorConfigMenu::content() {
         
     ImGui::Checkbox("enable snow effects", &display.enableSnow);
     ImGui::SliderInt("background dimming amount", &display.backgroundDim, 0, 254);
-
-    if(lastDim != display.backgroundDim){
-        try{
-            display.video->removeTexture(libtrainsim::Video::imguiHandler::getDarkenTexture(lastDim)->getName());
-            display.video->addTexture(libtrainsim::Video::imguiHandler::getDarkenTexture(display.backgroundDim));
-        }catch(...){}
-    }
     
     if(display.enableSnow != lastSnowState){
         if(display.enableSnow){
@@ -78,6 +71,18 @@ void simulatorConfigMenu::content() {
         }else{
             display.video->removeTexture(libtrainsim::Video::imguiHandler::getDarkenTexture(display.backgroundDim)->getName());
             display.video->removeTexture(display.snow->getOutputTexture()->getName());
+        }
+    }
+
+    if(lastDim != display.backgroundDim){
+        if(display.enableSnow){
+            try{
+                display.video->removeTexture(libtrainsim::Video::imguiHandler::getDarkenTexture(lastDim)->getName());
+                display.video->removeTexture(display.snow->getOutputTexture()->getName());
+
+                display.video->addTexture(libtrainsim::Video::imguiHandler::getDarkenTexture(display.backgroundDim));
+                display.video->addTexture(display.snow->getOutputTexture());
+            }catch(...){}
         }
     }
 }
@@ -257,7 +262,7 @@ simulator::simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> 
     
     //create the empty window
     try{
-        video->createWindow(track.getName(),settings->getShaderLocation(), settings->getTextureLocation());
+        video->createWindow(track.getName());
         if(enableSnow){
             video->addTexture(libtrainsim::Video::imguiHandler::getDarkenTexture(backgroundDim));
         }
@@ -330,6 +335,7 @@ void simulator::update(){
         if(enableSnow){
             snow->updateTexture();
         }
+        
         video->refreshWindow();
         
         libtrainsim::Video::imguiHandler::endRender();

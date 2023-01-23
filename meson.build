@@ -52,9 +52,9 @@ sources = [
 ]
 
 #try to check if all individual shader files are valid
-if not get_option('no-data')
-    subdir('data/production_data/shaders')
-endif
+#if not get_option('no-data')
+#    subdir('data/production_data/shaders')
+#endif
 
 install_data('application-json.png',install_dir:get_option('bindir'))
 
