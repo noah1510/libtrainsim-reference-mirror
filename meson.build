@@ -9,10 +9,10 @@ project(
         'libtrainsim:build_full=true',
         'b_lto=true',
         'b_pgo=off',
-        'warning_level=3'
+        'warning_level=everything'
     ],
     version : '0.11.0',
-    meson_version : '>= 0.56.0',
+    meson_version : '>= 1.0.0',
 )
 
 compiler = meson.get_compiler('cpp')
