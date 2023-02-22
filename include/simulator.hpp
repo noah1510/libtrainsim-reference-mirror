@@ -8,11 +8,11 @@
 #include "statusDisplay.hpp"
 #include "snowFx.hpp"
 
-class configSelectionWindow :public libtrainsim::Video::window{
+class configSelectionWindow :public SimpleGFX::SimpleGL::window{
   private:
     void content() override;
     bool close = false;
-    std::shared_ptr<libtrainsim::Video::texture> fileTex = nullptr;
+    std::shared_ptr<SimpleGFX::SimpleGL::texture> fileTex = nullptr;
     std::shared_ptr<libtrainsim::core::simulatorConfiguration> conf = nullptr;
   public:
     configSelectionWindow();
@@ -23,7 +23,7 @@ class configSelectionWindow :public libtrainsim::Video::window{
 
 class simulatorConfigMenu;
 
-class mainMenu:public libtrainsim::Video::window{
+class mainMenu:public SimpleGFX::SimpleGL::window{
   private:
     std::shared_ptr<libtrainsim::core::simulatorConfiguration> conf;
     int selectedTrackID;
@@ -76,7 +76,7 @@ class simulator{
         void serial_speedlvl(libtrainsim::core::input_axis Slvl);
 };
 
-class simulatorConfigMenu : public libtrainsim::Video::tabPage {
+class simulatorConfigMenu : public SimpleGFX::SimpleGL::tabPage {
   private:
     void content() override;
     simulator& display;

@@ -8,6 +8,7 @@
 #include "simulator.hpp"
 
 using namespace std::literals;
+using namespace SimpleGFX::SimpleGL;
 
 int main(int argc, char* argv[]){
     
@@ -28,7 +29,7 @@ int main(int argc, char* argv[]){
     assert((libtrainsim::core::lib_version >= required_version) && "libtrainsim version not high enogh!");
     
     //init the imgui handler
-    libtrainsim::Video::imguiHandler::init("libtrainsim reference implementation");
+    imguiHandler::init("libtrainsim reference implementation");
 
     //load the simulator configuration
     std::unique_ptr<configSelectionWindow> configSelection = nullptr;
@@ -39,13 +40,13 @@ int main(int argc, char* argv[]){
     }
     
     do{
-        libtrainsim::Video::imguiHandler::startRender();
+        imguiHandler::startRender();
             
         configSelection->draw();
         
-        libtrainsim::Video::imguiHandler::endRender();
+        imguiHandler::endRender();
 
-        if(libtrainsim::Video::imguiHandler::shouldTerminate()){
+        if(imguiHandler::shouldTerminate()){
             return 0;
         }
     }while(!configSelection->closeWindow());
@@ -59,27 +60,27 @@ int main(int argc, char* argv[]){
     bool loadingSimulator = false;
     std::unique_ptr<mainMenu> menu = std::make_unique<mainMenu>(conf);
     
-    while(!libtrainsim::Video::imguiHandler::shouldTerminate()){
+    while(!imguiHandler::shouldTerminate()){
         if(!loadingSimulator){
-            libtrainsim::Video::imguiHandler::startRender();
+            imguiHandler::startRender();
             
             menu->draw();
             loadingSimulator = menu->shouldStart();
             
-            libtrainsim::Video::imguiHandler::endRender();
+            imguiHandler::endRender();
                 
             
         }else{
             //display the loading screen before catually starting the load
-            libtrainsim::Video::imguiHandler::startRender();
+            imguiHandler::startRender();
                 
                 ImGui::Text("Loading simulator...");
             
-            libtrainsim::Video::imguiHandler::endRender();
+            imguiHandler::endRender();
             
             //start loading the simulator during the next render cycle
             //while the code is waiting for the load to finish the loading screen is being displayed
-            libtrainsim::Video::imguiHandler::startRender();
+            imguiHandler::startRender();
                 
                 ImGui::Text("Loading simulator...");
                 
@@ -87,7 +88,7 @@ int main(int argc, char* argv[]){
                     //clear all gl errors before loading the sim
                     int glErrorCode;
                     while((glErrorCode = glGetError()) != GL_NO_ERROR){
-                        std::cout << "GL Error found: " << libtrainsim::Video::imguiHandler::decodeGLError(glErrorCode) << std::endl;
+                        std::cout << "GL Error found: " << imguiHandler::decodeGLError(glErrorCode) << std::endl;
                     }
                     
                     menu->finishTrackLoad();
@@ -107,7 +108,7 @@ int main(int argc, char* argv[]){
                     break;
                 }
             
-            libtrainsim::Video::imguiHandler::endRender();
+            imguiHandler::endRender();
             
             //update the simulator in the current thread
             while(!sim->hasErrored()){

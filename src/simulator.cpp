@@ -4,12 +4,13 @@ using namespace libtrainsim::core;
 
 using namespace sakurajin::unit_system;
 using namespace sakurajin::unit_system::literals;
+using namespace SimpleGFX::SimpleGL;
 using namespace std::literals;
 
 configSelectionWindow::configSelectionWindow():window{"configFileSelection"}{
     try{
         std::filesystem::path texpath = "application-json.png";
-        fileTex = std::make_shared<libtrainsim::Video::texture>(texpath);
+        fileTex = std::make_shared<texture>(texpath);
     }catch(...){
         std::throw_with_nested(std::runtime_error("cannot load file texture"));
     }
@@ -66,10 +67,10 @@ void simulatorConfigMenu::content() {
     
     if(display.enableSnow != lastSnowState){
         if(display.enableSnow){
-            display.video->addTexture(libtrainsim::Video::imguiHandler::getDarkenTexture(display.backgroundDim));
+            display.video->addTexture(imguiHandler::getDarkenTexture(display.backgroundDim));
             display.video->addTexture(display.snow->getOutputTexture());
         }else{
-            display.video->removeTexture(libtrainsim::Video::imguiHandler::getDarkenTexture(display.backgroundDim)->getName());
+            display.video->removeTexture(imguiHandler::getDarkenTexture(display.backgroundDim)->getName());
             display.video->removeTexture(display.snow->getOutputTexture()->getName());
         }
     }
@@ -77,10 +78,10 @@ void simulatorConfigMenu::content() {
     if(lastDim != display.backgroundDim){
         if(display.enableSnow){
             try{
-                display.video->removeTexture(libtrainsim::Video::imguiHandler::getDarkenTexture(lastDim)->getName());
+                display.video->removeTexture(imguiHandler::getDarkenTexture(lastDim)->getName());
                 display.video->removeTexture(display.snow->getOutputTexture()->getName());
 
-                display.video->addTexture(libtrainsim::Video::imguiHandler::getDarkenTexture(display.backgroundDim));
+                display.video->addTexture(imguiHandler::getDarkenTexture(display.backgroundDim));
                 display.video->addTexture(display.snow->getOutputTexture());
             }catch(...){}
         }
@@ -205,7 +206,7 @@ void mainMenu::content() {
 simulator::~simulator(){
     hasError = true;
     
-    libtrainsim::Video::imguiHandler::removeSettingsTab("simulator");
+    imguiHandler::removeSettingsTab("simulator");
     
     std::cout << std::endl;
     std::cout << "closing the simulator" << std::endl;
@@ -228,7 +229,7 @@ simulator::~simulator(){
     
     int glErrorCode;
     while((glErrorCode = glGetError()) != GL_NO_ERROR){
-        std::cout << "GL Error found: " << libtrainsim::Video::imguiHandler::decodeGLError(glErrorCode) << std::endl;
+        std::cout << "GL Error found: " << imguiHandler::decodeGLError(glErrorCode) << std::endl;
     }
     
     std::cout << "simulator has exited" << std::endl;
@@ -238,7 +239,7 @@ simulator::simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> 
     //load the input system
     try{
         input = std::make_unique<libtrainsim::control::input_handler>(settings->getSerialConfigLocation());
-        libtrainsim::Video::imguiHandler::glErrorCheck();
+        imguiHandler::glErrorCheck();
     }catch(...){
         std::throw_with_nested(std::runtime_error("Cannot create input_handler"));
     }
@@ -246,7 +247,7 @@ simulator::simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> 
     //load the physics
     try{
         phy = std::make_unique<libtrainsim::physics>(settings->getCurrentTrack());
-        libtrainsim::Video::imguiHandler::glErrorCheck();
+        imguiHandler::glErrorCheck();
     }catch(...){
         std::throw_with_nested(std::runtime_error("Error initializing physics"));
     }
@@ -255,7 +256,7 @@ simulator::simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> 
     try{
         video = std::make_unique<libtrainsim::Video::videoManager>();
         video->load(track.getVideoFilePath());
-        libtrainsim::Video::imguiHandler::glErrorCheck();
+        imguiHandler::glErrorCheck();
     }catch(...){
         std::throw_with_nested(std::runtime_error("could not load video"));
     }
@@ -264,7 +265,7 @@ simulator::simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> 
     try{
         video->createWindow(track.getName());
         if(enableSnow){
-            video->addTexture(libtrainsim::Video::imguiHandler::getDarkenTexture(backgroundDim));
+            video->addTexture(imguiHandler::getDarkenTexture(backgroundDim));
         }
     }catch(const std::exception& e){
         std::throw_with_nested(std::runtime_error("Could not create simulator window"));
@@ -319,7 +320,7 @@ simulator::simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> 
     });
     
     //add the settings page after everything else has been fully added
-    libtrainsim::Video::imguiHandler::addSettingsTab(std::make_shared<simulatorConfigMenu>(*this));
+    imguiHandler::addSettingsTab(std::make_shared<simulatorConfigMenu>(*this));
 }
 
 void simulator::update(){
@@ -328,7 +329,7 @@ void simulator::update(){
     
     //actually render all of the windows
     try{
-        libtrainsim::Video::imguiHandler::startRender();
+        imguiHandler::startRender();
 
         statusWindow->draw();
         
@@ -338,7 +339,7 @@ void simulator::update(){
         
         video->refreshWindow();
         
-        libtrainsim::Video::imguiHandler::endRender();
+        imguiHandler::endRender();
     }catch(...){
         std::throw_with_nested(std::runtime_error("Error rendering the windows"));
     }
