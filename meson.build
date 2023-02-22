@@ -9,7 +9,7 @@ project(
         'libtrainsim:build_full=true',
         'b_lto=true',
         'b_pgo=off',
-        'warning_level=everything'
+        'warning_level=3'
     ],
     version : '0.11.0',
     meson_version : '>= 1.0.0',
