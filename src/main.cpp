@@ -36,7 +36,7 @@ int main(int argc, char* argv[]){
     auto group = Gtk::WindowGroup::create();
 
     try{
-        videoMan = Gtk::make_managed<videoManager>("simulatorWindow", conf);
+        videoMan = Gtk::make_managed<videoManager>(conf);
     }catch(const std::exception& e){
         GLHelper::print_exception(e);
         return 2;
