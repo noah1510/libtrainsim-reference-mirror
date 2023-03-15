@@ -5,12 +5,56 @@
 #include <memory>
 #include <cassert>
 
-#include "simulator.hpp"
+//#include "simulator.hpp"
 
 using namespace std::literals;
 using namespace SimpleGFX::SimpleGL;
+using namespace libtrainsim::Video;
+using namespace libtrainsim::core;
 
 int main(int argc, char* argv[]){
+
+    #ifdef setenv
+        setenv( "MESA_DEBUG", "", 0 );
+    #endif
+
+    auto app = Gtk::Application::create("thm.bahn_simulator.reference");
+    if(! app->register_application()){
+        std::cerr << "could not register app!" << std::endl;
+        return 1;
+    }
+
+    std::shared_ptr<simulatorConfiguration> conf = nullptr;
+    try{
+        conf = std::make_shared<simulatorConfiguration>("data/production_data/simulator.json");
+    }catch(const std::exception& e){
+        GLHelper::print_exception(e);
+        return 1;
+    }
+
+    videoManager* videoMan;
+    auto group = Gtk::WindowGroup::create();
+
+    try{
+        videoMan = Gtk::make_managed<videoManager>("simulatorWindow", conf);
+    }catch(const std::exception& e){
+        GLHelper::print_exception(e);
+        return 2;
+    }
+
+    group->add_window(*videoMan);
+
+    for(auto win:group->list_windows()){
+        app->add_window(*win);
+    }
+
+    videoMan->set_visible(true);
+
+    return app->run(argc, argv);
+}
+
+
+/*int main(int argc, char* argv[]){
     
     //set a flag to display opengl errors on linux
     #ifdef setenv
@@ -130,4 +174,4 @@ int main(int argc, char* argv[]){
     }
 
     return 0;
-}
+}*/

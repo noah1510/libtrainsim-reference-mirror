@@ -6,7 +6,9 @@ project(
         'c_std=c11',
         'cpp_std=c++17',
         'b_coverage=false',
-        'libtrainsim:build_full=true',
+        'libtrainsim:build_full=false',
+        'libtrainsim:build_extra=false',
+        'libtrainsim:build_control=false',
         'b_lto=true',
         'b_pgo=off',
         'warning_level=3'
@@ -41,14 +43,15 @@ endif
 libtrainsim_version = meson.project_version()
 
 deps = [
-    dependency('libtrainsim-full', required: true, fallback: 'libtrainsim', version : '>=' + libtrainsim_version),
+    #dependency('libtrainsim-full', required: true, fallback: 'libtrainsim', version : '>=' + libtrainsim_version),
+    dependency('libtrainsim-video', required: true, fallback: 'libtrainsim', version : '>=' + libtrainsim_version),
 ]
 
 incdir = include_directories('include')
 
 sources = [
     'src/main.cpp',
-    'src/simulator.cpp',
+    #'src/simulator.cpp',
 ]
 
 #try to check if all individual shader files are valid
