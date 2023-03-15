@@ -1,6 +1,6 @@
 [wrap-git]
 url = https://git.thm.de/bahn-simulator/libtrainsim.git
-revision = main
+revision = gtk_port
 
 [provides]
 dependency_names = ['libtrainsim-full','libtrainsim-core','libtrainsim-control','libtrainsim-video','libtrainsim-physics']
