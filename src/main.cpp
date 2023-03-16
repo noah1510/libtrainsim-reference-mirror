@@ -33,7 +33,7 @@ int main(int argc, char* argv[]){
         return 1;
     }
 
-    auto input = std::make_shared<libtrainsim::control::input_handler>(conf->getSerialConfigLocation());
+    auto input = std::make_shared<libtrainsim::control::input_handler>(conf);
 
     videoManager* videoMan;
     auto group = Gtk::WindowGroup::create();
