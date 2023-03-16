@@ -8,7 +8,6 @@ project(
         'b_coverage=false',
         'libtrainsim:build_full=false',
         'libtrainsim:build_extra=false',
-        'libtrainsim:build_control=false',
         'b_lto=true',
         'b_pgo=off',
         'warning_level=3'
@@ -45,6 +44,7 @@ libtrainsim_version = meson.project_version()
 deps = [
     #dependency('libtrainsim-full', required: true, fallback: 'libtrainsim', version : '>=' + libtrainsim_version),
     dependency('libtrainsim-video', required: true, fallback: 'libtrainsim', version : '>=' + libtrainsim_version),
+    dependency('libtrainsim-control', required: true, fallback: 'libtrainsim', version : '>=' + libtrainsim_version),
 ]
 
 incdir = include_directories('include')

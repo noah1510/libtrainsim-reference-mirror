@@ -1,4 +1,5 @@
 #include "video.hpp"
+#include "control.hpp"
 #include "simulator_config.hpp"
 
 #include <future>
@@ -32,6 +33,8 @@ int main(int argc, char* argv[]){
         return 1;
     }
 
+    auto input = std::make_shared<libtrainsim::control::input_handler>(conf->getSerialConfigLocation());
+
     videoManager* videoMan;
     auto group = Gtk::WindowGroup::create();
 
@@ -49,6 +52,10 @@ int main(int argc, char* argv[]){
     }
 
     videoMan->set_visible(true);
+
+    input->registerWindow(*videoMan);
+    input->addEventCallback(sigc::mem_fun(*videoMan, &videoManager::handleEvents));
+    input->Keymap().add(GDK_KEY_F10, "MAXIMIZE");
 
     return app->run(argc, argv);
 }
