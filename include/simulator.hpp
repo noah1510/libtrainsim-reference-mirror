@@ -5,10 +5,10 @@
 #include "physics.hpp"
 #include "control.hpp"
 
-#include "statusDisplay.hpp"
-#include "snowFx.hpp"
+//#include "statusDisplay.hpp"
+//#include "snowFx.hpp"
 
-class configSelectionWindow :public SimpleGFX::SimpleGL::window{
+/*class configSelectionWindow :public Gtk::Window{
   private:
     void content() override;
     bool close = false;
@@ -19,11 +19,12 @@ class configSelectionWindow :public SimpleGFX::SimpleGL::window{
     configSelectionWindow(std::string initialLocation);
     std::shared_ptr<libtrainsim::core::simulatorConfiguration> getConfig();
     bool closeWindow() const;
-};
+};*/
 
-class simulatorConfigMenu;
+//class simulatorConfigMenu;
 
-class mainMenu:public SimpleGFX::SimpleGL::window{
+class simulator;
+class mainMenu:public Gtk::Window{
   private:
     std::shared_ptr<libtrainsim::core::simulatorConfiguration> conf;
     int selectedTrackID;
@@ -32,7 +33,10 @@ class mainMenu:public SimpleGFX::SimpleGL::window{
     int stopEnd;
     bool ShouldStart = false;
     std::vector<std::future<void>> asycTrackLoads;
-    void content() override;
+
+    Gtk::Button* startButton;
+    std::shared_ptr<libtrainsim::control::input_handler> input;
+    std::unique_ptr<simulator> sim;
   public:
     mainMenu(std::shared_ptr<libtrainsim::core::simulatorConfiguration> _conf);
     ~mainMenu();
@@ -41,45 +45,55 @@ class mainMenu:public SimpleGFX::SimpleGL::window{
     void finishTrackLoad();
     int getSelectedTrack() const;
     std::pair<int, int> getStopIDs() const;
+    void on_realize() override;
 };
 
 class simulator{
-    friend class simulatorConfigMenu;
+    //friend class simulatorConfigMenu;
     private:
+        std::shared_ptr<libtrainsim::core::simulatorConfiguration> settings;
+        std::shared_ptr<libtrainsim::control::input_handler> input;
+        Glib::RefPtr<Gtk::Application> mainApp;
+        const libtrainsim::core::Track& track;
+        mainMenu& mmainMenu;
+        Glib::RefPtr<Gtk::WindowGroup> simulatorGroup;
+
         bool hasError = true;
         std::shared_mutex errorMutex;
 
-        libtrainsim::core::input_axis Speedlevel;
-
         std::future<void> physicsLoop;
+        std::future<void> updateLoop;
+        std::vector<uint64_t> callbackIDs;
 
-        const libtrainsim::core::Track& track;
         std::unique_ptr<libtrainsim::physics> phy;
 
-        std::unique_ptr<libtrainsim::Video::videoManager> video;
-        std::unique_ptr<libtrainsim::extras::statusDisplay> statusWindow;
-        std::unique_ptr<libtrainsim::extras::snowFx> snow;
-        std::unique_ptr<libtrainsim::control::input_handler> input;
+        libtrainsim::Video::videoManager* video;
+        //std::unique_ptr<libtrainsim::extras::statusDisplay> statusWindow;
+        //std::unique_ptr<libtrainsim::extras::snowFx> snow;
+
 
         bool enableSnow = false;
         int backgroundDim = 20;
 
     public:
-        simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> settings);
+        simulator(
+            std::shared_ptr<libtrainsim::core::simulatorConfiguration> _settings,
+            std::shared_ptr<libtrainsim::control::input_handler> _input,
+            Glib::RefPtr<Gtk::Application> _mainApp,
+            mainMenu& _mainMenu
+        );
         ~simulator();
         bool hasErrored();
         void end();
-        
-        void emergencyBreak();
-        void update();
 
-        void serial_speedlvl(libtrainsim::core::input_axis Slvl);
+        void updatePhysics();
+        void update();
 };
 
-class simulatorConfigMenu : public SimpleGFX::SimpleGL::tabPage {
+/*class simulatorConfigMenu : public SimpleGFX::SimpleGL::tabPage {
   private:
     void content() override;
     simulator& display;
   public:
     simulatorConfigMenu(simulator& disp);
-};
+};*/

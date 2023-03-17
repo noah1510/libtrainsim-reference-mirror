@@ -45,13 +45,14 @@ deps = [
     #dependency('libtrainsim-full', required: true, fallback: 'libtrainsim', version : '>=' + libtrainsim_version),
     dependency('libtrainsim-video', required: true, fallback: 'libtrainsim', version : '>=' + libtrainsim_version),
     dependency('libtrainsim-control', required: true, fallback: 'libtrainsim', version : '>=' + libtrainsim_version),
+    dependency('libtrainsim-physics', required: true, fallback: 'libtrainsim', version : '>=' + libtrainsim_version),
 ]
 
 incdir = include_directories('include')
 
 sources = [
     'src/main.cpp',
-    #'src/simulator.cpp',
+    'src/simulator.cpp',
 ]
 
 #try to check if all individual shader files are valid

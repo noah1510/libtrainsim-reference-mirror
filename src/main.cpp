@@ -6,7 +6,7 @@
 #include <memory>
 #include <cassert>
 
-//#include "simulator.hpp"
+#include "simulator.hpp"
 
 using namespace std::literals;
 using namespace SimpleGFX::SimpleGL;
@@ -33,29 +33,17 @@ int main(int argc, char* argv[]){
         return 1;
     }
 
-    auto input = std::make_shared<libtrainsim::control::input_handler>(conf);
-
-    videoManager* videoMan;
-    auto group = Gtk::WindowGroup::create();
+    std::unique_ptr<mainMenu> menu = nullptr;
 
     try{
-        videoMan = Gtk::make_managed<videoManager>(conf);
+        menu = std::make_unique<mainMenu>(conf);
     }catch(const std::exception& e){
         GLHelper::print_exception(e);
         return 2;
     }
 
-    group->add_window(*videoMan);
-
-    for(auto win:group->list_windows()){
-        app->add_window(*win);
-    }
-
-    videoMan->set_visible(true);
-
-    input->registerWindow(*videoMan);
-    input->addEventCallback(sigc::mem_fun(*videoMan, &videoManager::handleEvents));
-    input->Keymap().add(GDK_KEY_F10, "MAXIMIZE");
+    app->add_window(*menu);
+    menu->set_visible(true);
 
     return app->run(argc, argv);
 }
