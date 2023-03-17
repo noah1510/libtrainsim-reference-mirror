@@ -32,9 +32,9 @@ class mainMenu:public Gtk::Window{
     int stopBegin;
     int stopEnd;
     bool ShouldStart = false;
-    std::vector<std::future<void>> asycTrackLoads;
+    void reCreateTrackList();
+    std::vector<std::future<void>> asyncTrackLoads;
 
-    Gtk::Button* startButton;
     std::shared_ptr<libtrainsim::control::input_handler> input;
     std::unique_ptr<simulator> sim;
   public:
@@ -45,7 +45,6 @@ class mainMenu:public Gtk::Window{
     void finishTrackLoad();
     int getSelectedTrack() const;
     std::pair<int, int> getStopIDs() const;
-    void on_realize() override;
 };
 
 class simulator{
