@@ -7,7 +7,6 @@ project(
         'cpp_std=c++17',
         'b_coverage=false',
         'libtrainsim:build_full=false',
-        'libtrainsim:build_extra=false',
         'b_lto=true',
         'b_pgo=off',
         'warning_level=3'
@@ -46,6 +45,7 @@ deps = [
     dependency('libtrainsim-video', required: true, fallback: 'libtrainsim', version : '>=' + libtrainsim_version),
     dependency('libtrainsim-control', required: true, fallback: 'libtrainsim', version : '>=' + libtrainsim_version),
     dependency('libtrainsim-physics', required: true, fallback: 'libtrainsim', version : '>=' + libtrainsim_version),
+    dependency('trainsim-extras-statusDisplay', required: true, fallback: 'libtrainsim', version : '>=' + libtrainsim_version),
 ]
 
 incdir = include_directories('include')

@@ -143,7 +143,7 @@ simulator::simulator(
         std::throw_with_nested(std::runtime_error("Error initializing physics"));
     }
     
-    //create the empty window
+    //create the video window
     try{
         simulatorGroup = Gtk::WindowGroup::create();
 
@@ -169,6 +169,19 @@ simulator::simulator(
     }
 
 
+    //load the status display
+    try{
+        statusWindow = Gtk::make_managed<libtrainsim::extras::statusDisplay>();
+        simulatorGroup->add_window(*statusWindow);
+
+        input->registerWindow(*statusWindow);
+
+        statusWindow->changeBeginPosition(track.firstLocation());
+        statusWindow->changeEndPosition(track.lastLocation());
+    }catch(...){
+        std::throw_with_nested(std::runtime_error("Could not create status window"));
+    }
+
 
     //display all windows in the group
     for(auto win:simulatorGroup->list_windows()){
@@ -176,16 +189,8 @@ simulator::simulator(
         win->set_visible(true);
     }
     
-    /*
-    //load the status display
-    try{
-        statusWindow = std::make_unique<libtrainsim::extras::statusDisplay>();
-        statusWindow->changeBeginPosition(track.firstLocation());
-        statusWindow->changeEndPosition(track.lastLocation());
-    }catch(...){
-        std::throw_with_nested(std::runtime_error("Could not create status window"));
-    }
 
+    /*
     //create the snow fx layer
     try{
         snow = std::make_unique<libtrainsim::extras::snowFx>(settings);
@@ -272,23 +277,26 @@ void simulator::update(){
     auto next_time = libtrainsim::core::Helper::now();
 
     time_si frametime = unit_cast(next_time-last_time, multiplier(std::milli::type{}));
-    //statusWindow->appendFrametime(frametime);
+    statusWindow->appendFrametime(frametime);
 
     auto renderTimes = video->getNewRendertimes();
     if(renderTimes.has_value()){
         for(auto time:renderTimes.value()){
-            //statusWindow->appendRendertime(time);
+            statusWindow->appendRendertime(time);
         }
     }
 
-    //statusWindow->changePosition(phy->getLocation());
+    statusWindow->changePosition(phy->getLocation());
 
-    //statusWindow->setAcceleration(phy->getAcceleration());
-    //statusWindow->setSpeedLevel(Speedlevel);
+    statusWindow->setAcceleration(phy->getAcceleration());
+    statusWindow->setSpeedLevel(input->getSpeedAxis());
 
     auto vel = phy->getVelocity();
     //snow->updateTrainSpeed(vel);
-    //statusWindow->setVelocity(vel);
+    statusWindow->setVelocity(vel);
+
+
+    statusWindow->redraw();
 
     while(Helper::now()-last_time < 8ms){
         std::this_thread::sleep_until(last_time+8ms);

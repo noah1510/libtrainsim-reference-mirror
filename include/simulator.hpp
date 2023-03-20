@@ -5,7 +5,7 @@
 #include "physics.hpp"
 #include "control.hpp"
 
-//#include "statusDisplay.hpp"
+#include "statusDisplay.hpp"
 //#include "snowFx.hpp"
 
 /*class configSelectionWindow :public Gtk::Window{
@@ -45,7 +45,7 @@ class simulator{
         std::unique_ptr<libtrainsim::physics> phy;
 
         libtrainsim::Video::videoManager* video;
-        //std::unique_ptr<libtrainsim::extras::statusDisplay> statusWindow;
+        libtrainsim::extras::statusDisplay* statusWindow;
         //std::unique_ptr<libtrainsim::extras::snowFx> snow;
 
 
