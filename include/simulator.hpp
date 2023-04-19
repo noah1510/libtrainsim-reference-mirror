@@ -40,7 +40,6 @@ class simulator{
 
         std::future<void> physicsLoop;
         std::future<void> updateLoop;
-        std::vector<uint64_t> callbackIDs;
 
         std::unique_ptr<libtrainsim::physics> phy;
 

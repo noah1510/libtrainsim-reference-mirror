@@ -2,13 +2,13 @@
 
 #include "simulator.hpp"
 
-class mainMenu:public Gtk::Window{
+class mainMenu:public Gtk::Window, public SimpleGFX::eventHandle{
   private:
     std::shared_ptr<libtrainsim::core::simulatorConfiguration> conf;
-    int selectedTrackID;
-    int lastTrackID;
-    int stopBegin;
-    int stopEnd;
+    size_t selectedTrackID;
+    size_t lastTrackID;
+    size_t stopBegin;
+    size_t stopEnd;
     bool ShouldStart = false;
     void reCreateTrackList();
     std::vector<std::future<void>> asyncTrackLoads;
@@ -23,4 +23,6 @@ class mainMenu:public Gtk::Window{
     void finishTrackLoad();
     int getSelectedTrack() const;
     std::pair<int, int> getStopIDs() const;
+
+    void on_show() override;
 };

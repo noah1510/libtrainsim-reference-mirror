@@ -8,11 +8,54 @@
 
 #include "simulator.hpp"
 #include "mainMenu.hpp"
+#include "appLauncher.hpp"
+#include "loggerWindow.hpp"
 
 using namespace std::literals;
 using namespace SimpleGFX::SimpleGL;
 using namespace libtrainsim::Video;
 using namespace libtrainsim::core;
+
+class mainApp : public SimpleGFX::SimpleGL::appLauncher{
+    private:
+        std::shared_ptr<libtrainsim::core::simulatorConfiguration> conf;
+        std::unique_ptr<mainMenu> menu;
+        std::shared_ptr<SimpleGFX::SimpleGL::loggerWindow> loggerWin;
+
+        void prepare() override{
+
+           try{
+                loggerWin = SimpleGFX::SimpleGL::loggerWindow::createManaged(SimpleGFX::loggingLevel::detail);
+                conf->getLogger()->addExtraLogger(loggerWin);
+                add_window(*loggerWin);
+                loggerWin->set_visible(true);
+            }catch(...){
+                std::throw_with_nested(std::runtime_error("could not create logger window"));
+            }
+
+        }
+
+        void load() override{
+            try{
+                menu = std::make_unique<mainMenu>(conf);
+                add_window(*menu);
+                menu->set_visible(true);
+            }catch(...){
+                conf->getLogger()->logCurrrentException(true);
+                std::throw_with_nested(std::runtime_error("could not create main menu"));
+            }
+
+            loadFinished = true;
+        }
+    public:
+        mainApp() : appLauncher("thm.bahn_simulator.reference", Gio::Application::Flags::NONE, true){
+            try{
+                conf = std::make_shared<simulatorConfiguration>("data/production_data/simulator.json");
+            }catch(...){
+                    std::throw_with_nested(std::runtime_error("could not load configuration"));
+            }
+        }
+};
 
 int main(int argc, char* argv[]){
 
@@ -21,33 +64,16 @@ int main(int argc, char* argv[]){
         setenv( "mesa_glthread", "true", 1 );
     #endif
 
-    auto app = Gtk::Application::create("thm.bahn_simulator.reference");
-    if(! app->register_application()){
-        std::cerr << "could not register app!" << std::endl;
-        return 1;
-    }
-
-    std::shared_ptr<simulatorConfiguration> conf = nullptr;
-    try{
-        conf = std::make_shared<simulatorConfiguration>("data/production_data/simulator.json");
-    }catch(const std::exception& e){
-        GLHelper::print_exception(e);
-        return 1;
-    }
-
-    std::unique_ptr<mainMenu> menu = nullptr;
+    std::shared_ptr<mainApp> app = nullptr;
 
     try{
-        menu = std::make_unique<mainMenu>(conf);
+        app = std::make_shared<mainApp>();
     }catch(const std::exception& e){
-        GLHelper::print_exception(e);
-        return 2;
+        libtrainsim::core::Helper::printException(e);
+        return 100;
     }
 
-    app->add_window(*menu);
-    menu->set_visible(true);
-
-    return app->run(argc, argv);
+    return app->launch(argc, argv);
 }
 
 

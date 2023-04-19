@@ -91,36 +91,10 @@ void simulatorConfigMenu::content() {
 }*/
 
 simulator::~simulator(){
-    hasError = true;
-
+    end();
     
     //imguiHandler::removeSettingsTab("simulator");
     
-    std::cout << std::endl;
-    std::cout << "closing the simulator" << std::endl;
-    simulatorGroup.reset();
-    for(auto id:callbackIDs){
-        input->removeEventCallback(id);
-    }
-    input->resetFlags();
-    
-    std::cout << "   waiting for physics thread to end" << std::endl;
-    if(physicsLoop.valid()){
-        physicsLoop.wait();
-        physicsLoop.get();
-    }
-    //std::cout << "   destroying snowfx" << std::endl;
-    //snow.reset();
-    //std::cout << "   destroying status window" << std::endl;
-    //statusWindow.reset();
-    //std::cout << "   destroying videoManager" << std::endl;
-    //video->close();
-    std::cout << "   destroying physics" << std::endl;
-    phy.reset();
-    std::cout << "   destroying input_handler" << std::endl;
-    input.reset();
-    
-    std::cout << "simulator has exited" << std::endl;
 }
 
 simulator::simulator(
@@ -150,15 +124,11 @@ simulator::simulator(
         video = Gtk::make_managed<videoManager>(settings);
         simulatorGroup->add_window(*video);
 
-        input->registerWindow(*video);
-        auto id = input->addEventCallback(sigc::mem_fun(*video, &videoManager::handleEvents));
-        std::cout << "sim callback id: " << id << std::endl;
-        callbackIDs.emplace_back(id);
-        input->Keymap().add(GDK_KEY_F10, "MAXIMIZE");
+        video->registerWithEventManager(settings->getInputManager().get());
+        input->getKeyboardPoller()->addWindow(video);
 
         video->signal_close_request().connect([this](){
-            mainApp->add_window(mmainMenu);
-            mmainMenu.set_visible(true);
+            end();
             return false;
         },false);
         //if(enableSnow){
@@ -174,7 +144,8 @@ simulator::simulator(
         statusWindow = Gtk::make_managed<libtrainsim::extras::statusDisplay>();
         simulatorGroup->add_window(*statusWindow);
 
-        input->registerWindow(*statusWindow);
+        statusWindow->registerWithEventManager(settings->getInputManager().get());
+        input->getKeyboardPoller()->addWindow(statusWindow);
 
         statusWindow->changeBeginPosition(track.firstLocation());
         statusWindow->changeEndPosition(track.lastLocation());
@@ -258,17 +229,9 @@ void simulator::update(){
     static auto last_time = libtrainsim::core::Helper::now();
     //actually render all of the windows
     try{
-        //imguiHandler::startRender();
-
-        //statusWindow->draw();
-
         if(enableSnow){
             //snow->updateTexture();
         }
-
-        //video->refreshWindow();
-
-        //imguiHandler::endRender();
     }catch(...){
         std::throw_with_nested(std::runtime_error("Error rendering the windows"));
     }
@@ -295,8 +258,7 @@ void simulator::update(){
     //snow->updateTrainSpeed(vel);
     statusWindow->setVelocity(vel);
 
-
-    statusWindow->redraw();
+    statusWindow->redrawGraphs();
 
     while(Helper::now()-last_time < 8ms){
         std::this_thread::sleep_until(last_time+8ms);
@@ -304,17 +266,56 @@ void simulator::update(){
 
     last_time = Helper::now();
 
-    input->update();
-
-    if(input->closingFlag()){
-        std::cout << "Esc key is pressed by user. Stoppig the video" << std::endl;
-        video->close();
-    }
+    //if(input->closingFlag()){
+    //    std::cout << "Esc key is pressed by user. Stoppig the video" << std::endl;
+    //    video->close();
+    //}
 }
 
 void simulator::end(){
-    std::scoped_lock lock{errorMutex};
+    auto coreLogger = settings->getLogger();
+    coreLogger->logMessage("Closing simulator", SimpleGFX::loggingLevel::detail);
+
+    errorMutex.lock();
+    if(hasError){return;};
     hasError = true;
+    errorMutex.unlock();
+
+    mainApp->mark_busy();
+
+    if(video->is_visible()){
+        video->close();
+    }
+
+    mainApp->add_window(mmainMenu);
+    mmainMenu.set_visible(true);
+
+    coreLogger->logMessage("waiting for threads to end", SimpleGFX::loggingLevel::detail);
+    if(physicsLoop.valid()){
+        physicsLoop.wait();
+        //physicsLoop.get();
+    }
+
+    coreLogger->logMessage("waiting for update thread to end", SimpleGFX::loggingLevel::detail);
+    if(updateLoop.valid()){
+        updateLoop.wait();
+        //updateLoop.get();
+    }
+
+    std::scoped_lock lock{errorMutex};
+    input->resetFlags();
+
+    coreLogger->logMessage("destroying physics", SimpleGFX::loggingLevel::detail);
+    phy.reset();
+
+    //std::cout << "   destroying snowfx" << std::endl;
+    //snow.reset();
+
+    coreLogger->logMessage("resetting the simulator group", SimpleGFX::loggingLevel::detail);
+    simulatorGroup.reset();
+
+    coreLogger->logMessage("simulator has exited", SimpleGFX::loggingLevel::detail);
+    mainApp->unmark_busy();
 }
 
 bool simulator::hasErrored(){

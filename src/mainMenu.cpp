@@ -8,11 +8,13 @@ using namespace sakurajin::unit_system::literals;
 using namespace SimpleGFX::SimpleGL;
 using namespace std::literals;
 
-mainMenu::mainMenu(std::shared_ptr<libtrainsim::core::simulatorConfiguration> _conf) : Gtk::Window{}, conf{_conf}{
+mainMenu::mainMenu(std::shared_ptr<libtrainsim::core::simulatorConfiguration> _conf) : Gtk::Window{}, SimpleGFX::eventHandle(), conf{_conf}{
 
-    input = std::make_shared<libtrainsim::control::input_handler>(conf); Gtk::Window::on_realize();
+    conf->getLogger()->logMessage("Creating the main menu", SimpleGFX::loggingLevel::detail);
 
-    std::cout << "realizing the main Menu" << std::endl;
+    input = std::make_shared<libtrainsim::control::input_handler>(conf);
+    input->registerWithEventManager(conf->getInputManager().get());
+
     sim.reset();
     sim = nullptr;
 
@@ -20,6 +22,8 @@ mainMenu::mainMenu(std::shared_ptr<libtrainsim::core::simulatorConfiguration> _c
     set_default_size(1280, 720);
 
     reCreateTrackList();
+
+    conf->getLogger()->logMessage("Main menu created", SimpleGFX::loggingLevel::normal);
 }
 
 void mainMenu::reCreateTrackList() {
@@ -47,23 +51,32 @@ void mainMenu::reCreateTrackList() {
         //create the lauch button for this track
         auto startButton = Gtk::make_managed<Gtk::Button>("Start Simulator");
         startButton->signal_clicked().connect([this, i](){
+            conf->getLogger()->logMessage("Start button pressed", SimpleGFX::loggingLevel::normal);
             try{
                 get_application()->mark_busy();
 
-                for(auto i = asyncTrackLoads.begin(); i < asyncTrackLoads.end(); i++){
-                    if(i->valid()){
-                        i->wait();
-                        i = asyncTrackLoads.erase(i);
+                conf->getLogger()->logMessage("Waiting for track to load", SimpleGFX::loggingLevel::detail);
+                for(auto j = asyncTrackLoads.begin(); j < asyncTrackLoads.end(); j++){
+                    if(j->valid()){
+                        j->wait();
+                        j = asyncTrackLoads.erase(j);
                     }
                 }
+
+                conf->getLogger()->logMessage("selecting track: " + conf->getTrack(i).getName(), SimpleGFX::loggingLevel::detail);
                 conf->selectTrack(i);
+
+                conf->getLogger()->logMessage("Setting start and end location", SimpleGFX::loggingLevel::detail);
                 const auto& stops = conf->getCurrentTrack().getStations();
                 conf->getTrack(selectedTrackID).setFirstLocation(stops[stopBegin].position());
                 conf->getTrack(selectedTrackID).setLastLocation(stops[stopEnd].position());
+
+                conf->getLogger()->logMessage("Creating the simulator", SimpleGFX::loggingLevel::detail);
                 sim = std::make_unique<simulator>(conf, input, get_application(), *this);
+
                 get_application()->unmark_busy();
             }catch(const std::exception& e){
-                Helper::print_exception(e);
+                Helper::printException(e);
                 close();
                 return;
             }
@@ -140,6 +153,10 @@ mainMenu::~mainMenu(){
     finishTrackLoad();
 }
 
+void mainMenu::on_show(){
+    return Gtk::Window::on_show();
+}
+
 void mainMenu::finishTrackLoad() {
     //wait for all tracks to finish loading before starting the track
     for(auto& task:asyncTrackLoads){
@@ -156,7 +173,7 @@ bool mainMenu::shouldStart() const {
 }
 
 int mainMenu::getSelectedTrack() const {
-    return selectedTrackID;
+    return static_cast<int>(selectedTrackID);
 }
 
 std::pair<int, int> mainMenu::getStopIDs() const {
