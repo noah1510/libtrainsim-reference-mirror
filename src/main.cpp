@@ -16,6 +16,8 @@ using namespace SimpleGFX::SimpleGL;
 using namespace libtrainsim::Video;
 using namespace libtrainsim::core;
 
+const std::string appName = "thm.bahn_simulator.reference";
+
 class mainApp : public SimpleGFX::SimpleGL::appLauncher{
     private:
         std::shared_ptr<libtrainsim::core::simulatorConfiguration> conf;
@@ -48,11 +50,14 @@ class mainApp : public SimpleGFX::SimpleGL::appLauncher{
             loadFinished = true;
         }
     public:
-        mainApp() : appLauncher("thm.bahn_simulator.reference", Gio::Application::Flags::NONE, true){
+        mainApp() : appLauncher(appName, Gio::Application::Flags::NONE, true){
             try{
-                conf = std::make_shared<simulatorConfiguration>("data/production_data/simulator.json");
+                conf = simulatorConfiguration::loadLast(appName);
+                if(conf == nullptr){
+                    conf = std::make_shared<simulatorConfiguration>("data/production_data/simulator.json", true, appName);
+                }
             }catch(...){
-                    std::throw_with_nested(std::runtime_error("could not load configuration"));
+                std::throw_with_nested(std::runtime_error("could not load configuration"));
             }
         }
 };

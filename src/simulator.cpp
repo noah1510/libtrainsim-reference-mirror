@@ -274,7 +274,7 @@ void simulator::update(){
 
 void simulator::end(){
     auto coreLogger = settings->getLogger();
-    coreLogger->logMessage("Closing simulator", SimpleGFX::loggingLevel::detail);
+    *coreLogger << SimpleGFX::loggingLevel::debug << "Closing simulator";
 
     errorMutex.lock();
     if(hasError){return;};
@@ -290,13 +290,13 @@ void simulator::end(){
     mainApp->add_window(mmainMenu);
     mmainMenu.set_visible(true);
 
-    coreLogger->logMessage("waiting for threads to end", SimpleGFX::loggingLevel::detail);
+    *coreLogger << SimpleGFX::loggingLevel::debug << "waiting for threads to end";
     if(physicsLoop.valid()){
         physicsLoop.wait();
         //physicsLoop.get();
     }
 
-    coreLogger->logMessage("waiting for update thread to end", SimpleGFX::loggingLevel::detail);
+    *coreLogger << SimpleGFX::loggingLevel::debug << "waiting for update thread to end";
     if(updateLoop.valid()){
         updateLoop.wait();
         //updateLoop.get();
@@ -305,16 +305,16 @@ void simulator::end(){
     std::scoped_lock lock{errorMutex};
     input->resetFlags();
 
-    coreLogger->logMessage("destroying physics", SimpleGFX::loggingLevel::detail);
+    *coreLogger << SimpleGFX::loggingLevel::debug << "destroying physics";
     phy.reset();
 
     //std::cout << "   destroying snowfx" << std::endl;
     //snow.reset();
 
-    coreLogger->logMessage("resetting the simulator group", SimpleGFX::loggingLevel::detail);
+    *coreLogger << SimpleGFX::loggingLevel::debug << "resetting the simulator group";
     simulatorGroup.reset();
 
-    coreLogger->logMessage("simulator has exited", SimpleGFX::loggingLevel::detail);
+    *coreLogger << SimpleGFX::loggingLevel::normal << "simulator has exited";
     mainApp->unmark_busy();
 }
 

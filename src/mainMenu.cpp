@@ -10,7 +10,7 @@ using namespace std::literals;
 
 mainMenu::mainMenu(std::shared_ptr<libtrainsim::core::simulatorConfiguration> _conf) : Gtk::Window{}, SimpleGFX::eventHandle(), conf{_conf}{
 
-    conf->getLogger()->logMessage("Creating the main menu", SimpleGFX::loggingLevel::detail);
+    *conf->getLogger() << SimpleGFX::loggingLevel::debug << "Creating the main menu";
 
     input = std::make_shared<libtrainsim::control::input_handler>(conf);
     input->registerWithEventManager(conf->getInputManager().get());
@@ -23,7 +23,7 @@ mainMenu::mainMenu(std::shared_ptr<libtrainsim::core::simulatorConfiguration> _c
 
     reCreateTrackList();
 
-    conf->getLogger()->logMessage("Main menu created", SimpleGFX::loggingLevel::normal);
+    *conf->getLogger() << SimpleGFX::loggingLevel::normal << "Main menu created";
 }
 
 void mainMenu::reCreateTrackList() {
@@ -51,11 +51,11 @@ void mainMenu::reCreateTrackList() {
         //create the lauch button for this track
         auto startButton = Gtk::make_managed<Gtk::Button>("Start Simulator");
         startButton->signal_clicked().connect([this, i](){
-            conf->getLogger()->logMessage("Start button pressed", SimpleGFX::loggingLevel::normal);
+            *conf->getLogger() << SimpleGFX::loggingLevel::normal << "Start button pressed";
             try{
                 get_application()->mark_busy();
 
-                conf->getLogger()->logMessage("Waiting for track to load", SimpleGFX::loggingLevel::detail);
+                *conf->getLogger() << SimpleGFX::loggingLevel::debug << "Waiting for track to load";
                 for(auto j = asyncTrackLoads.begin(); j < asyncTrackLoads.end(); j++){
                     if(j->valid()){
                         j->wait();
@@ -63,15 +63,17 @@ void mainMenu::reCreateTrackList() {
                     }
                 }
 
-                conf->getLogger()->logMessage("selecting track: " + conf->getTrack(i).getName(), SimpleGFX::loggingLevel::detail);
                 conf->selectTrack(i);
 
-                conf->getLogger()->logMessage("Setting start and end location", SimpleGFX::loggingLevel::detail);
                 const auto& stops = conf->getCurrentTrack().getStations();
+
+                *conf->getLogger() << SimpleGFX::loggingLevel::detail << "Setting start location: " << stopBegin << " to " << conf->getCurrentTrack().getStations()[stopBegin].name();
                 conf->getTrack(selectedTrackID).setFirstLocation(stops[stopBegin].position());
+
+                *conf->getLogger() << SimpleGFX::loggingLevel::detail << "Setting end location: " << stopEnd << " to " << conf->getCurrentTrack().getStations()[stopEnd].name();
                 conf->getTrack(selectedTrackID).setLastLocation(stops[stopEnd].position());
 
-                conf->getLogger()->logMessage("Creating the simulator", SimpleGFX::loggingLevel::detail);
+                *conf->getLogger() << SimpleGFX::loggingLevel::debug << "Creating the simulator";
                 sim = std::make_unique<simulator>(conf, input, get_application(), *this);
 
                 get_application()->unmark_busy();
