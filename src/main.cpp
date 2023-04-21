@@ -52,10 +52,7 @@ class mainApp : public SimpleGFX::SimpleGL::appLauncher{
     public:
         mainApp() : appLauncher(appName, Gio::Application::Flags::NONE, true){
             try{
-                conf = simulatorConfiguration::loadLast(appName);
-                if(conf == nullptr){
-                    conf = std::make_shared<simulatorConfiguration>("data/production_data/simulator.json", true, appName);
-                }
+                conf = std::make_shared<simulatorConfiguration>("data/production_data/simulator.json", true, appName, true);
             }catch(...){
                 std::throw_with_nested(std::runtime_error("could not load configuration"));
             }
