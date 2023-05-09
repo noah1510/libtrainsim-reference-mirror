@@ -94,8 +94,8 @@ void mainMenu::reCreateTrackList() {
         auto buttonPane = Gtk::make_managed<Gtk::Paned>(Gtk::Orientation::HORIZONTAL);
         pagePane->set_start_child(*buttonPane);
 
-        auto buttonListBegin = Gtk::make_managed<Gtk::Box>(Gtk::Orientation::HORIZONTAL);
-        auto buttonListEnd = Gtk::make_managed<Gtk::Box>(Gtk::Orientation::HORIZONTAL);
+        auto buttonListBegin = Gtk::make_managed<Gtk::Box>(Gtk::Orientation::VERTICAL);
+        auto buttonListEnd = Gtk::make_managed<Gtk::Box>(Gtk::Orientation::VERTICAL);
         Gtk::CheckButton* button0Begin;
         Gtk::CheckButton* button0End;
 
@@ -123,7 +123,9 @@ void mainMenu::reCreateTrackList() {
         //add all end station buttons
         for(uint64_t j = 1; j < stations.size();j++){
             auto* btn = Gtk::make_managed<Gtk::CheckButton>(stations[j].name());
-            btn->set_active();
+            if(j == stations.size()-1){
+                btn->set_active();
+            }
 
             //radioButtons.emplace_back(btn);
             buttonListEnd->append(*btn);

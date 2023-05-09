@@ -50,7 +50,7 @@ class mainApp : public SimpleGFX::SimpleGL::appLauncher{
             loadFinished = true;
         }
     public:
-        mainApp() : appLauncher(appName, Gio::Application::Flags::NONE, true){
+        mainApp() : appLauncher(appName, Gio::Application::Flags::NONE, false){
             try{
                 conf = std::make_shared<simulatorConfiguration>("data/production_data/simulator.json", true, appName, true);
             }catch(...){
