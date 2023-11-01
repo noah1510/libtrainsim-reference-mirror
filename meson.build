@@ -53,7 +53,8 @@ incdir = include_directories('include')
 sources = [
     'src/main.cpp',
     'src/simulator.cpp',
-    'src/mainMenu.cpp',
+    'src/mainWindow.cpp',
+    'src/trackSelectionWidget.cpp',
 ]
 
 #try to check if all individual shader files are valid

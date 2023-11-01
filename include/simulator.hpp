@@ -1,11 +1,7 @@
 #pragma once
 
-#include "simulator_config.hpp"
-#include "video.hpp"
-#include "physics.hpp"
-#include "control.hpp"
+#include "simulator_includes.hpp"
 
-#include "statusDisplay.hpp"
 //#include "snowFx.hpp"
 
 /*class configSelectionWindow :public Gtk::Window{
@@ -23,7 +19,7 @@
 
 //class simulatorConfigMenu;
 
-class mainMenu;
+class mainWindow;
 
 class simulator{
     //friend class simulatorConfigMenu;
@@ -32,11 +28,9 @@ class simulator{
         std::shared_ptr<libtrainsim::control::input_handler> input;
         Glib::RefPtr<Gtk::Application> mainApp;
         const libtrainsim::core::Track& track;
-        mainMenu& mmainMenu;
         Glib::RefPtr<Gtk::WindowGroup> simulatorGroup;
 
-        bool hasError = true;
-        std::shared_mutex errorMutex;
+        std::atomic<bool> hasError = true;
 
         std::future<void> physicsLoop;
         std::future<void> updateLoop;
@@ -55,8 +49,7 @@ class simulator{
         simulator(
             std::shared_ptr<libtrainsim::core::simulatorConfiguration> _settings,
             std::shared_ptr<libtrainsim::control::input_handler> _input,
-            Glib::RefPtr<Gtk::Application> _mainApp,
-            mainMenu& _mainMenu
+            Glib::RefPtr<Gtk::Application> _mainApp
         );
         ~simulator();
         bool hasErrored();

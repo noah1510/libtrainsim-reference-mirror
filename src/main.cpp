@@ -1,27 +1,29 @@
+#include "simulator_includes.hpp"
+
 #include "video.hpp"
 #include "control.hpp"
-#include "simulator_config.hpp"
 
 #include <future>
 #include <memory>
-#include <cassert>
 
-#include "simulator.hpp"
-#include "mainMenu.hpp"
 #include "appLauncher.hpp"
 #include "loggerWindow.hpp"
+#include "mainWindow.hpp"
 
 using namespace std::literals;
 using namespace SimpleGFX::SimpleGL;
 using namespace libtrainsim::Video;
 using namespace libtrainsim::core;
 
+class mainApp;
+
 const std::string appName = "thm.bahn_simulator.reference";
+static std::shared_ptr<mainApp> appInstance = nullptr;
 
 class mainApp : public SimpleGFX::SimpleGL::appLauncher{
     private:
         std::shared_ptr<libtrainsim::core::simulatorConfiguration> conf;
-        std::unique_ptr<mainMenu> menu;
+        std::unique_ptr<mainWindow> menu;
         std::shared_ptr<SimpleGFX::SimpleGL::loggerWindow> loggerWin;
 
         void prepare() override{
@@ -39,15 +41,21 @@ class mainApp : public SimpleGFX::SimpleGL::appLauncher{
 
         void load() override{
             try{
-                menu = std::make_unique<mainMenu>(conf);
+                menu = std::make_unique<mainWindow>(conf, appInstance);
                 add_window(*menu);
                 menu->set_visible(true);
+                menu->present();
+                menu->registerWithEventManager(conf->getInputManager().get(), 0);
             }catch(...){
                 conf->getLogger()->logCurrrentException(true);
                 std::throw_with_nested(std::runtime_error("could not create main menu"));
             }
 
             loadFinished = true;
+        }
+
+        void on_startup() override {
+            appLauncher::on_startup();
         }
     public:
         mainApp() : appLauncher(appName, Gio::Application::Flags::NONE, false){
@@ -56,6 +64,18 @@ class mainApp : public SimpleGFX::SimpleGL::appLauncher{
             }catch(...){
                 std::throw_with_nested(std::runtime_error("could not load configuration"));
             }
+
+            auto quit = Gio::SimpleAction::create("quit");
+            quit->signal_activate().connect([this](const Glib::VariantBase&){
+                this->quit();
+            });
+            add_action(quit);
+
+            auto menuBar = Gio::Menu::create();
+            auto quitItem = Gio::MenuItem::create("Quit", "app.quit");
+            menuBar->append_item(quitItem);
+
+            set_menubar(menuBar);
         }
 };
 
@@ -66,16 +86,14 @@ int main(int argc, char* argv[]){
         setenv( "mesa_glthread", "true", 1 );
     #endif
 
-    std::shared_ptr<mainApp> app = nullptr;
-
     try{
-        app = std::make_shared<mainApp>();
+        appInstance = std::make_shared<mainApp>();
     }catch(const std::exception& e){
         libtrainsim::core::Helper::printException(e);
         return 100;
     }
 
-    return app->launch(argc, argv);
+    return appInstance->launch(argc, argv);
 }
 
 

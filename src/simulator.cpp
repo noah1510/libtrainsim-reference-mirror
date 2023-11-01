@@ -1,5 +1,6 @@
 #include "simulator.hpp"
-#include "mainMenu.hpp"
+
+#include <utility>
 
 using namespace libtrainsim::core;
 using namespace libtrainsim::Video;
@@ -100,14 +101,12 @@ simulator::~simulator(){
 simulator::simulator(
     std::shared_ptr<libtrainsim::core::simulatorConfiguration> _settings,
     std::shared_ptr<libtrainsim::control::input_handler> _input,
-    Glib::RefPtr<Gtk::Application> _mainApp,
-    mainMenu& _mainMenu
+    Glib::RefPtr<Gtk::Application> _mainApp
 ):
-    settings{_settings},
-    input{_input},
-    mainApp{_mainApp},
-    track{settings->getCurrentTrack()},
-    mmainMenu{_mainMenu}
+    settings{std::move(_settings)},
+    input{std::move(_input)},
+    mainApp{std::move(_mainApp)},
+    track{settings->getCurrentTrack()}
 {
     
     //load the physics
@@ -124,13 +123,13 @@ simulator::simulator(
         video = Gtk::make_managed<videoManager>(settings);
         simulatorGroup->add_window(*video);
 
-        video->registerWithEventManager(settings->getInputManager().get());
+        video->registerWithEventManager(settings->getInputManager().get(), 0);
         input->getKeyboardPoller()->addWindow(video);
 
         video->signal_close_request().connect([this](){
             end();
             return false;
-        },false);
+        },true);
         //if(enableSnow){
         //    video->addTexture(imguiHandler::getDarkenTexture(backgroundDim));
         //}
@@ -140,11 +139,12 @@ simulator::simulator(
 
 
     //load the status display
+    /*
     try{
         statusWindow = Gtk::make_managed<libtrainsim::extras::statusDisplay>();
         simulatorGroup->add_window(*statusWindow);
 
-        statusWindow->registerWithEventManager(settings->getInputManager().get());
+        statusWindow->registerWithEventManager(settings->getInputManager().get(), 0);
         input->getKeyboardPoller()->addWindow(statusWindow);
 
         statusWindow->changeBeginPosition(track.firstLocation());
@@ -152,7 +152,7 @@ simulator::simulator(
     }catch(...){
         std::throw_with_nested(std::runtime_error("Could not create status window"));
     }
-
+    */
 
     //display all windows in the group
     for(auto win:simulatorGroup->list_windows()){
@@ -176,6 +176,8 @@ simulator::simulator(
     }catch(...){
         std::throw_with_nested(std::runtime_error("Cannot create input_handler"));
     }
+
+    video->present();
 
     hasError = false;
     
@@ -228,37 +230,35 @@ void simulator::updatePhysics(){
 void simulator::update(){
     static auto last_time = libtrainsim::core::Helper::now();
     //actually render all of the windows
-    try{
-        if(enableSnow){
+    //try{
+        //if(enableSnow){
             //snow->updateTexture();
-        }
-    }catch(...){
-        std::throw_with_nested(std::runtime_error("Error rendering the windows"));
-    }
+        //}
+    //}catch(...){
+    //    std::throw_with_nested(std::runtime_error("Error rendering the windows"));
+    //}
 
     //display statistics (speed, location, frametime, etc.)
-    auto next_time = libtrainsim::core::Helper::now();
-
-    time_si frametime = unit_cast(next_time-last_time, multiplier(std::milli::type{}));
-    statusWindow->appendFrametime(frametime);
+    //auto next_time = libtrainsim::core::Helper::now();
+    //statusWindow->appendFrametime(unit_cast(next_time-last_time));
 
     auto renderTimes = video->getNewRendertimes();
-    if(renderTimes.has_value()){
-        for(auto time:renderTimes.value()){
-            statusWindow->appendRendertime(time);
-        }
-    }
+    //if(renderTimes.has_value()){
+    //    for(auto time:renderTimes.value()){
+    //        statusWindow->appendRendertime(time);
+    //    }
+    //}
 
-    statusWindow->changePosition(phy->getLocation());
+    //statusWindow->changePosition(phy->getLocation());
 
-    statusWindow->setAcceleration(phy->getAcceleration());
-    statusWindow->setSpeedLevel(input->getSpeedAxis());
+    //statusWindow->setAcceleration(phy->getAcceleration());
+    //statusWindow->setSpeedLevel(input->getSpeedAxis());
 
-    auto vel = phy->getVelocity();
+    //auto vel = phy->getVelocity();
     //snow->updateTrainSpeed(vel);
-    statusWindow->setVelocity(vel);
+    //statusWindow->setVelocity(vel);
 
-    statusWindow->redrawGraphs();
+    //statusWindow->redrawGraphs();
 
     while(Helper::now()-last_time < 8ms){
         std::this_thread::sleep_until(last_time+8ms);
@@ -276,19 +276,15 @@ void simulator::end(){
     auto coreLogger = settings->getLogger();
     *coreLogger << SimpleGFX::loggingLevel::debug << "Closing simulator";
 
-    errorMutex.lock();
     if(hasError){return;};
     hasError = true;
-    errorMutex.unlock();
+    settings->getInputManager()->raiseEvent(simulatorStopEvent::create());
 
     mainApp->mark_busy();
 
     if(video->is_visible()){
         video->close();
     }
-
-    mainApp->add_window(mmainMenu);
-    mmainMenu.set_visible(true);
 
     *coreLogger << SimpleGFX::loggingLevel::debug << "waiting for threads to end";
     if(physicsLoop.valid()){
@@ -302,7 +298,6 @@ void simulator::end(){
         //updateLoop.get();
     }
 
-    std::scoped_lock lock{errorMutex};
     input->resetFlags();
 
     *coreLogger << SimpleGFX::loggingLevel::debug << "destroying physics";
@@ -319,6 +314,5 @@ void simulator::end(){
 }
 
 bool simulator::hasErrored(){
-    std::shared_lock lock{errorMutex};
     return hasError;
 }
