@@ -1,7 +1,5 @@
 #include "mainWindow.hpp"
 
-#include <utility>
-
 using namespace libtrainsim::core;
 using namespace libtrainsim::Video;
 

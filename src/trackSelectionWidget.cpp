@@ -1,7 +1,5 @@
 #include "trackSelectionWidget.hpp"
 
-#include <utility>
-
 using namespace libtrainsim::core;
 using namespace libtrainsim::Video;
 
@@ -57,7 +55,7 @@ void trackSelectionWidget::reCreateTrackList() {
 
                 conf->getInputManager()->raiseEvent(simulatorStartEvent::create(i, stopBegin, stopEnd));
             } catch (const std::exception& e) {
-                Helper::printException(e);
+                SimpleGFX::helper::printException(e);
                 app->quit();
                 return;
             }

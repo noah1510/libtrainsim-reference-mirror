@@ -1,3 +1,4 @@
 option('march', type : 'string', value : 'native', description : 'The compiler architecture the code should be optimized for (default: native).')
 option('no-data', type: 'boolean', value: false, description: 'do not install the data folder when this is set to true')
 option('vcpkg-path', type: 'string', value: '', description: 'the root vcpkg path to find additioal libs')
+option('gl_debug', type: 'feature', value: 'auto', description: 'enable OpenGL debug output')

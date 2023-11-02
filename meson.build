@@ -40,6 +40,21 @@ endif
 #the minimum required libtrainsim version
 libtrainsim_version = meson.project_version()
 
+driver_debug = false
+if get_option('gl_debug').auto()
+    driver_debug = get_option('buildtype').contains('debug')
+elif get_option('gl_debug').enabled()
+    driver_debug = true
+endif
+
+if driver_debug
+    if target_machine.system() == 'windows'
+        add_global_arguments('-DGL_WINDOWS_DEBUG', language : 'cpp')
+    elif target_machine.system() == 'linux'
+        add_global_arguments('-DGL_LINUX_DEBUG', language : 'cpp')
+    endif
+endif
+
 deps = [
     #dependency('libtrainsim-full', required: true, fallback: 'libtrainsim', version : '>=' + libtrainsim_version),
     dependency('libtrainsim-video', required: true, fallback: 'libtrainsim', version : '>=' + libtrainsim_version),
@@ -71,6 +86,7 @@ executable(
     dependencies: deps,
     win_subsystem: 'windows',
     install : true,
+    cpp_pch: 'include/pch/simulator_pch.hpp',
 )
 
 

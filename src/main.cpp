@@ -1,13 +1,3 @@
-#include "simulator_includes.hpp"
-
-#include "video.hpp"
-#include "control.hpp"
-
-#include <future>
-#include <memory>
-
-#include "appLauncher.hpp"
-#include "loggerWindow.hpp"
 #include "mainWindow.hpp"
 
 using namespace std::literals;
@@ -29,10 +19,10 @@ class mainApp : public SimpleGFX::SimpleGL::appLauncher{
         void prepare() override{
 
            try{
-                loggerWin = SimpleGFX::SimpleGL::loggerWindow::createManaged(SimpleGFX::loggingLevel::detail);
-                conf->getLogger()->addExtraLogger(loggerWin);
-                add_window(*loggerWin);
-                loggerWin->set_visible(true);
+                //loggerWin = SimpleGFX::SimpleGL::loggerWindow::createManaged(SimpleGFX::loggingLevel::detail);
+                //conf->getLogger()->addExtraLogger(loggerWin);
+                //add_window(*loggerWin);
+                //loggerWin->set_visible(true);
             }catch(...){
                 std::throw_with_nested(std::runtime_error("could not create logger window"));
             }
@@ -81,15 +71,19 @@ class mainApp : public SimpleGFX::SimpleGL::appLauncher{
 
 int main(int argc, char* argv[]){
 
-    #ifdef setenv
-        setenv( "MESA_DEBUG", "", 0 );
-        setenv( "mesa_glthread", "true", 1 );
-    #endif
+#ifdef GL_LINUX_DEBUG
+    setenv( "MESA_DEBUG", "context,incomplete_tex,incomplete_fbo", 1 );
+    setenv( "LIBGL_DEBUG", "verbose", 1 );
+    setenv( "RADV_DEBUG", "img,info,shaders", 1 );
+    setenv( "AMD_DEBUG", "info", 1 );
+    setenv( "mesa_glthread", "true", 1 );
+    //setenv("GDK_BACKEND", "x11", 1);
+#endif
 
     try{
         appInstance = std::make_shared<mainApp>();
     }catch(const std::exception& e){
-        libtrainsim::core::Helper::printException(e);
+        SimpleGFX::helper::printException(e);
         return 100;
     }
 

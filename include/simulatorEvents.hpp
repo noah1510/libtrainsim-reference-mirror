@@ -1,8 +1,5 @@
 #pragma once
 
-#include "eventSystem.hpp"
-#include "simplegfx_helper.hpp"
-#include <sstream>
 
 /**
  * @brief An input event to signal the start of the simulator.

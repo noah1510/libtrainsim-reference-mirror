@@ -1,7 +1,5 @@
 #include "simulator.hpp"
 
-#include <utility>
-
 using namespace libtrainsim::core;
 using namespace libtrainsim::Video;
 
@@ -183,15 +181,15 @@ simulator::simulator(
     
     //start the physics and video decode updates in a separate thread
     physicsLoop = std::async(std::launch::async, [this](){
-        auto last_time = libtrainsim::core::Helper::now();
+        auto last_time = SimpleGFX::helper::now();
 
         do{
             updatePhysics();
 
-            if(libtrainsim::core::Helper::now() - last_time < 5ms){
+            if(SimpleGFX::helper::now() - last_time < 5ms){
                 std::this_thread::sleep_until(last_time + 5ms);
             }
-            last_time = libtrainsim::core::Helper::now();
+            last_time = SimpleGFX::helper::now();
         }while(!hasErrored());
 
     });
@@ -228,7 +226,7 @@ void simulator::updatePhysics(){
 }
 
 void simulator::update(){
-    static auto last_time = libtrainsim::core::Helper::now();
+    static auto last_time = GLHelper::now();
     //actually render all of the windows
     //try{
         //if(enableSnow){
@@ -260,11 +258,11 @@ void simulator::update(){
 
     //statusWindow->redrawGraphs();
 
-    while(Helper::now()-last_time < 8ms){
+    while(GLHelper::now()-last_time < 8ms){
         std::this_thread::sleep_until(last_time+8ms);
     }
 
-    last_time = Helper::now();
+    last_time = GLHelper::now();
 
     //if(input->closingFlag()){
     //    std::cout << "Esc key is pressed by user. Stoppig the video" << std::endl;

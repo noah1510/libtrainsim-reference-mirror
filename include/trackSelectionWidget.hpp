@@ -1,7 +1,5 @@
 #pragma once
 
-#include "simulator_includes.hpp"
-
 class trackSelectionWidget : public Gtk::Frame, public SimpleGFX::eventHandle {
   private:
     std::shared_ptr<libtrainsim::core::simulatorConfiguration> conf;

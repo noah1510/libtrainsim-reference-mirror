@@ -1,7 +1,5 @@
 #pragma once
 
-#include "simulator_includes.hpp"
-
 //#include "snowFx.hpp"
 
 /*class configSelectionWindow :public Gtk::Window{
