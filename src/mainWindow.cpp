@@ -8,10 +8,11 @@ using namespace sakurajin::unit_system::literals;
 using namespace SimpleGFX::SimpleGL;
 using namespace std::literals;
 
-mainWindow::mainWindow(std::shared_ptr<libtrainsim::core::simulatorConfiguration> _conf, const Glib::RefPtr<Gtk::Application>& application)
+mainWindow::mainWindow(std::shared_ptr<libtrainsim::core::simulatorConfiguration> _conf, const std::shared_ptr<SimpleGFX::SimpleGL::appLauncher>& application)
     : Gtk::ApplicationWindow{application},
       SimpleGFX::eventHandle(),
-      conf{std::move(_conf)} {
+      conf{std::move(_conf)},
+      mainAppLauncher{application} {
 
     *conf->getLogger() << SimpleGFX::loggingLevel::debug << "Creating the main menu";
 
@@ -26,7 +27,7 @@ mainWindow::mainWindow(std::shared_ptr<libtrainsim::core::simulatorConfiguration
     //set_show_menubar(true);
 
     //create the track selection widget
-    trackSelection = std::make_unique<trackSelectionWidget>(conf, application);
+    trackSelection = std::make_unique<trackSelectionWidget>(conf, mainAppLauncher);
     set_child(*trackSelection);
 
     *conf->getLogger() << SimpleGFX::loggingLevel::normal << "Main menu created";
@@ -57,12 +58,13 @@ bool mainWindow::onEvent(const SimpleGFX::inputEvent& event) {
                            << conf->getCurrentTrack().getStations()[stopEnd].name();
 
         //create the simulator and start it
-        *conf->getLogger() << SimpleGFX::loggingLevel::debug << "Creating the simulator";
-        sim = std::make_unique<simulator>(conf, input, get_application());
-
-
-        //hide the track selection since we now have a simulator
-        trackSelection->hide();
+        //that call has to be deffered since this function is not called on the main thread
+        mainAppLauncher->callDeffered([this]() {
+            if(sim != nullptr) return;
+            *conf->getLogger() << SimpleGFX::loggingLevel::debug << "Creating the simulator";
+            sim = std::make_unique<simulator>(conf, input, mainAppLauncher);
+            //trackSelection->hide();
+        });
 
         return true;
     }
@@ -70,14 +72,17 @@ bool mainWindow::onEvent(const SimpleGFX::inputEvent& event) {
     //try to parse the event into a simulatorStopEvent
     auto stopEvent = simulatorStopEvent::parse(event);
     if (stopEvent.has_value()) {
-        // if the event is a simulatorStopEvent, stop the simulator
-        // and return true to indicate that the event was handled
-        *conf->getLogger() << SimpleGFX::loggingLevel::normal << "Stopping the simulator";
+        mainAppLauncher->callDeffered([this]() {
+            if(sim == nullptr) return;
+            // if the event is a simulatorStopEvent, stop the simulator
+            // and return true to indicate that the event was handled
+            *conf->getLogger() << SimpleGFX::loggingLevel::normal << "Stopping the simulator";
 
-        sim.reset();
-        sim = nullptr;
+            sim.reset();
+            sim = nullptr;
 
-        trackSelection->show();
+            //trackSelection->show();
+        });
 
         return true;
     }

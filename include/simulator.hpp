@@ -30,15 +30,11 @@ class simulator{
 
         std::atomic<bool> hasError = true;
 
-        std::future<void> physicsLoop;
-        std::future<void> updateLoop;
-
         std::unique_ptr<libtrainsim::physics> phy;
 
         libtrainsim::Video::videoManager* video;
         libtrainsim::extras::statusDisplay* statusWindow;
         //std::unique_ptr<libtrainsim::extras::snowFx> snow;
-
 
         bool enableSnow = false;
         int backgroundDim = 20;
@@ -53,8 +49,8 @@ class simulator{
         bool hasErrored();
         void end();
 
-        void updatePhysics();
-        void update();
+        bool updatePhysics();
+        bool update();
 };
 
 /*class simulatorConfigMenu : public SimpleGFX::SimpleGL::tabPage {

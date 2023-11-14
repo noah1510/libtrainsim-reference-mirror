@@ -179,28 +179,18 @@ simulator::simulator(
 
     hasError = false;
     
-    //start the physics and video decode updates in a separate thread
-    physicsLoop = std::async(std::launch::async, [this](){
-        auto last_time = SimpleGFX::helper::now();
+    //use the glib timer stuff to update the physics
+    //video decoding is done always done in an async thread by the videoManager
+    Glib::signal_timeout().connect(sigc::mem_fun(*this, &simulator::updatePhysics), 3);
 
-        do{
-            updatePhysics();
-
-            if(SimpleGFX::helper::now() - last_time < 5ms){
-                std::this_thread::sleep_until(last_time + 5ms);
-            }
-            last_time = SimpleGFX::helper::now();
-        }while(!hasErrored());
-
-    });
-
-    updateLoop = std::async(std::launch::async, [this](){do{update();}while(!hasErrored());});
+    Glib::signal_timeout().connect(sigc::mem_fun(*this, &simulator::update), 16);
     
     //add the settings page after everything else has been fully added
     //imguiHandler::addSettingsTab(std::make_shared<simulatorConfigMenu>(*this));
 }
 
-void simulator::updatePhysics(){
+bool simulator::updatePhysics(){
+    if(hasError){return false;};
 
     phy->setSpeedlevel(input->getSpeedAxis());
 
@@ -214,7 +204,7 @@ void simulator::updatePhysics(){
     //check if the simulator has to be closed
     if(video->getDecoder().reachedEndOfFile() || phy->reachedEnd()){
         end();
-        return;
+        return false;
     }
 
     //get the next frame that will be displayed
@@ -223,10 +213,12 @@ void simulator::updatePhysics(){
     //if there is already a frame that is being rendered
     //then this call will buffer the furthest frame to be rendered
     video->gotoFrame(frame_num);
+
+    return true;
 }
 
-void simulator::update(){
-    static auto last_time = GLHelper::now();
+bool simulator::update(){
+    if(hasError){return false;};
     //actually render all of the windows
     //try{
         //if(enableSnow){
@@ -258,16 +250,12 @@ void simulator::update(){
 
     //statusWindow->redrawGraphs();
 
-    while(GLHelper::now()-last_time < 8ms){
-        std::this_thread::sleep_until(last_time+8ms);
-    }
-
-    last_time = GLHelper::now();
-
     //if(input->closingFlag()){
     //    std::cout << "Esc key is pressed by user. Stoppig the video" << std::endl;
     //    video->close();
     //}
+
+    return true;
 }
 
 void simulator::end(){
@@ -282,18 +270,6 @@ void simulator::end(){
 
     if(video->is_visible()){
         video->close();
-    }
-
-    *coreLogger << SimpleGFX::loggingLevel::debug << "waiting for threads to end";
-    if(physicsLoop.valid()){
-        physicsLoop.wait();
-        //physicsLoop.get();
-    }
-
-    *coreLogger << SimpleGFX::loggingLevel::debug << "waiting for update thread to end";
-    if(updateLoop.valid()){
-        updateLoop.wait();
-        //updateLoop.get();
     }
 
     input->resetFlags();

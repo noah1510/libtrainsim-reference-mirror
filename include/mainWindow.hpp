@@ -11,8 +11,10 @@ class mainWindow :public Gtk::ApplicationWindow, public SimpleGFX::eventHandle{
 
     std::unique_ptr<trackSelectionWidget> trackSelection = nullptr;
     std::unique_ptr<simulator> sim = nullptr;
+
+    std::shared_ptr<SimpleGFX::SimpleGL::appLauncher> mainAppLauncher;
   public:
-    mainWindow(std::shared_ptr<libtrainsim::core::simulatorConfiguration> _conf, const Glib::RefPtr<Gtk::Application>& application);
+    mainWindow(std::shared_ptr<libtrainsim::core::simulatorConfiguration> _conf, const std::shared_ptr<SimpleGFX::SimpleGL::appLauncher>& application);
     ~mainWindow();
 
     bool onEvent(const SimpleGFX::inputEvent& event) override;

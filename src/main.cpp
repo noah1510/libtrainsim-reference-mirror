@@ -16,9 +16,8 @@ class mainApp : public SimpleGFX::SimpleGL::appLauncher{
         std::unique_ptr<mainWindow> menu;
         std::shared_ptr<SimpleGFX::SimpleGL::loggerWindow> loggerWin;
 
-        void prepare() override{
-
-           try{
+        void load() override{
+            try{
                 //loggerWin = SimpleGFX::SimpleGL::loggerWindow::createManaged(SimpleGFX::loggingLevel::detail);
                 //conf->getLogger()->addExtraLogger(loggerWin);
                 //add_window(*loggerWin);
@@ -27,9 +26,6 @@ class mainApp : public SimpleGFX::SimpleGL::appLauncher{
                 std::throw_with_nested(std::runtime_error("could not create logger window"));
             }
 
-        }
-
-        void load() override{
             try{
                 menu = std::make_unique<mainWindow>(conf, appInstance);
                 add_window(*menu);
@@ -40,8 +36,6 @@ class mainApp : public SimpleGFX::SimpleGL::appLauncher{
                 conf->getLogger()->logCurrrentException(true);
                 std::throw_with_nested(std::runtime_error("could not create main menu"));
             }
-
-            loadFinished = true;
         }
 
         void on_startup() override {
