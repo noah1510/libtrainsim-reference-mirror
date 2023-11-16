@@ -3,8 +3,7 @@ project(
     'c',
     'cpp',
     default_options : [
-        'c_std=c11',
-        'cpp_std=c++17',
+        'cpp_std=c++23',
         'b_coverage=false',
         'libtrainsim:build_full=false',
         'b_lto=true',
