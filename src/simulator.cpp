@@ -118,7 +118,7 @@ simulator::simulator(
     try{
         simulatorGroup = Gtk::WindowGroup::create();
 
-        video = Gtk::make_managed<videoManager>(settings);
+        video = Gtk::make_managed<outputWindow<renderWidgetGL>>(settings);
         simulatorGroup->add_window(*video);
 
         video->registerWithEventManager(settings->getInputManager().get(), 0);
@@ -202,7 +202,7 @@ bool simulator::updatePhysics(){
     auto loc = phy->getLocation();
 
     //check if the simulator has to be closed
-    if(video->getDecoder().reachedEndOfFile() || phy->reachedEnd()){
+    if(video->getRenderer().getDecoder().reachedEndOfFile() || phy->reachedEnd()){
         end();
         return false;
     }
