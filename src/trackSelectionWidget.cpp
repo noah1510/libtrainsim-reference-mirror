@@ -55,7 +55,7 @@ void trackSelectionWidget::reCreateTrackList() {
 
                 conf->getInputManager()->raiseEvent(simulatorStartEvent::create(i, stopBegin, stopEnd));
             } catch (const std::exception& e) {
-                SimpleGFX::helper::printException(e);
+                SimpleGFX::exception::printException(e);
                 app->quit();
                 return;
             }

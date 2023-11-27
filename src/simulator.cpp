@@ -24,7 +24,7 @@ configSelectionWindow::configSelectionWindow(std::string initialLocation):config
         conf = std::make_shared<libtrainsim::core::simulatorConfiguration>(initialLocation, true);
         close = true;
     }catch(const std::exception& e){
-        libtrainsim::core::Helper::print_exception(e);
+        SimpleGFX::exception::print_exception(e);
         conf = nullptr;
         close = false;
         return;
@@ -48,7 +48,7 @@ void configSelectionWindow::content(){
                 conf = std::make_shared<libtrainsim::core::simulatorConfiguration>(outPath.get(), true);
                 close = true;
             }catch(const std::exception& e){
-                libtrainsim::core::Helper::print_exception(e);
+                SimpleGFX::exception::print_exception(e);
                 conf = nullptr;
                 close = false;
                 return;
@@ -231,7 +231,7 @@ bool simulator::update() {
     //}
 
     // display statistics (speed, location, frametime, etc.)
-    // auto next_time = libtrainsim::core::Helper::now();
+    // auto next_time = SimpleGFX::chrono::now();
     // statusWindow->appendFrametime(unit_cast(next_time-last_time));
 
     auto renderTimes = video->getNewRendertimes();
@@ -270,8 +270,6 @@ void simulator::end() {
     hasError = true;
     settings->getInputManager()->raiseEvent(simulatorStopEvent::create());
 
-    mainApp->mark_busy();
-
     if (video->is_visible()) {
         video->close();
     }
@@ -284,11 +282,7 @@ void simulator::end() {
     // std::cout << "   destroying snowfx" << std::endl;
     // snow.reset();
 
-    *coreLogger << SimpleGFX::loggingLevel::debug << "resetting the simulator group";
-    simulatorGroup.reset();
-
     *coreLogger << SimpleGFX::loggingLevel::normal << "simulator has exited";
-    mainApp->unmark_busy();
 }
 
 bool simulator::hasErrored() {

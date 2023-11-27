@@ -36,7 +36,7 @@ class simulatorStartEvent {
             return {};
         }
 
-        auto split = SimpleGFX::helper::splitString(event.name, ';');
+        auto split = SimpleGFX::string::splitString(event.name, ';');
         if (split.size() != 3) {
             return {};
         }

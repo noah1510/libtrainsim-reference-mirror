@@ -77,7 +77,7 @@ int main(int argc, char* argv[]){
     try{
         appInstance = std::make_shared<mainApp>();
     }catch(const std::exception& e){
-        SimpleGFX::helper::printException(e);
+        SimpleGFX::exception::printException(e);
         return 100;
     }
 
