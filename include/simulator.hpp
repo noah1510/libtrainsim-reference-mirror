@@ -32,7 +32,7 @@ class simulator {
 
     std::unique_ptr<libtrainsim::physics> phy;
 
-    libtrainsim::Video::outputWindow<libtrainsim::Video::renderWidgetPicture>* video;
+    libtrainsim::Video::outputWindow_PictureGstreamer* video;
     libtrainsim::extras::statusDisplay*                                   statusWindow;
     // std::unique_ptr<libtrainsim::extras::snowFx> snow;
 

@@ -114,7 +114,7 @@ simulator::simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> 
     try {
         simulatorGroup = Gtk::WindowGroup::create();
 
-        video = Gtk::make_managed<outputWindow<renderWidgetPicture>>(settings, mainApp);
+        video = Gtk::make_managed<outputWindow_PictureGstreamer>(settings, mainApp);
         simulatorGroup->add_window(*video);
 
         video->registerWithEventManager(settings->getInputManager().get(), 0);
