@@ -16,6 +16,7 @@
 };*/
 
 // class simulatorConfigMenu;
+#define SIMULATOR_USE_FFMPEG
 
 class mainWindow;
 
@@ -32,7 +33,11 @@ class simulator {
 
     std::unique_ptr<libtrainsim::physics> phy;
 
+#ifdef SIMULATOR_USE_FFMPEG
+    libtrainsim::Video::outputWindow_PictureLibav* video;
+#else
     libtrainsim::Video::outputWindow_PictureGstreamer* video;
+#endif
     libtrainsim::extras::statusDisplay*                                   statusWindow;
     // std::unique_ptr<libtrainsim::extras::snowFx> snow;
 
