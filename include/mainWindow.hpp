@@ -3,7 +3,7 @@
 #include "simulator.hpp"
 #include "trackSelectionWidget.hpp"
 
-class mainWindow :public Gtk::ApplicationWindow, public SimpleGFX::eventHandle{
+class mainWindow :public Gtk::ApplicationWindow{
   private:
     std::shared_ptr<libtrainsim::core::simulatorConfiguration> conf;
 
@@ -17,6 +17,6 @@ class mainWindow :public Gtk::ApplicationWindow, public SimpleGFX::eventHandle{
     mainWindow(std::shared_ptr<libtrainsim::core::simulatorConfiguration> _conf, const std::shared_ptr<SimpleGFX::SimpleGL::appLauncher>& application);
     ~mainWindow();
 
-    bool onEvent(const SimpleGFX::inputEvent& event) override;
+    void onEvent(const SimpleGFX::inputEvent& event, bool& handled);
     bool on_close_request() override;
 };

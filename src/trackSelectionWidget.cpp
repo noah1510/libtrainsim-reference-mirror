@@ -10,7 +10,6 @@ using namespace std::literals;
 
 trackSelectionWidget::trackSelectionWidget(std::shared_ptr<libtrainsim::core::simulatorConfiguration> _conf, const Glib::RefPtr<Gtk::Application>& application)
     : Gtk::Frame{},
-      SimpleGFX::eventHandle(),
       conf{std::move(_conf)},
       app{application} {
 

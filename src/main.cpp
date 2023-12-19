@@ -31,7 +31,6 @@ class mainApp : public SimpleGFX::SimpleGL::appLauncher {
             add_window(*menu);
             menu->set_visible(true);
             menu->present();
-            menu->registerWithEventManager(conf->getInputManager().get(), 0);
         } catch (...) {
             conf->getLogger()->logCurrrentException(true);
             std::throw_with_nested(std::runtime_error("could not create main menu"));

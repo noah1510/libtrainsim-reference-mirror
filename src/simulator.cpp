@@ -116,12 +116,14 @@ simulator::simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> 
 
 #ifdef SIMULATOR_USE_FFMPEG
         video = Gtk::make_managed<outputWindow_PictureLibav>(settings, mainApp);
+        SimpleGFX::onEventSlot outputWindowSlot = sigc::mem_fun(*video, &outputWindow_PictureLibav::onEvent);
 #else
         video = Gtk::make_managed<outputWindow_PictureGstreamer>(settings, mainApp);
+        SimpleGFX::onEventSlot outputWindowSlot = sigc::mem_fun(*video, &outputWindow_PictureGstreamer::onEvent);
 #endif
         simulatorGroup->add_window(*video);
 
-        video->registerWithEventManager(settings->getInputManager().get(), 0);
+        settings->getInputManager()->registerHandler(outputWindowSlot);
         input->getKeyboardPoller()->addWindow(video);
 
         video->signal_close_request().connect(

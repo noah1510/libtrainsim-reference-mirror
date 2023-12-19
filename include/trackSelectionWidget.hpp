@@ -1,6 +1,6 @@
 #pragma once
 
-class trackSelectionWidget : public Gtk::Frame, public SimpleGFX::eventHandle {
+class trackSelectionWidget : public Gtk::Frame {
   private:
     std::shared_ptr<libtrainsim::core::simulatorConfiguration> conf;
     std::vector<std::future<void>>                             asyncTrackLoads;
