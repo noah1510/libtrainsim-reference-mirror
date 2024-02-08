@@ -17,8 +17,8 @@ mainWindow::mainWindow(std::shared_ptr<libtrainsim::core::simulatorConfiguration
     *conf->getLogger() << SimpleGFX::loggingLevel::debug << "Creating the main menu";
 
     input = std::make_shared<libtrainsim::control::input_handler>(conf);
-    conf->getInputManager()->registerHandler(sigc::mem_fun(*input, &libtrainsim::control::input_handler::onEvent));
-    conf->getInputManager()->registerHandler(sigc::mem_fun(*this, &mainWindow::onEvent));
+    conf->getInputManager()->registerHandler(*input);
+    conf->getInputManager()->registerHandler(*this);
 
     sim.reset();
     sim = nullptr;
@@ -36,7 +36,7 @@ mainWindow::mainWindow(std::shared_ptr<libtrainsim::core::simulatorConfiguration
 
 mainWindow::~mainWindow() {}
 
-void mainWindow::onEvent(const SimpleGFX::inputEvent& event, bool& handled) {
+void mainWindow::operator()(const SimpleGFX::inputEvent& event, bool& handled) {
     // try to parse the event into a simulatorStartEvent
     auto startEvent = simulatorStartEvent::parse(event);
     if (startEvent.has_value()) {
