@@ -122,7 +122,7 @@ simulator::simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> 
         simulatorGroup->add_window(*video);
 
         settings->getInputManager()->registerHandler(*video);
-        input->getKeyboardPoller()->addWindow(video);
+        input->getKeyboardPoller()->addWidget(*video);
 
         video->signal_close_request().connect(
             [this]() {

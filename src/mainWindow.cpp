@@ -34,7 +34,9 @@ mainWindow::mainWindow(std::shared_ptr<libtrainsim::core::simulatorConfiguration
     *conf->getLogger() << SimpleGFX::loggingLevel::normal << "Main menu created";
 }
 
-mainWindow::~mainWindow() {}
+mainWindow::~mainWindow() {
+    sec_untrack();
+}
 
 void mainWindow::operator()(const SimpleGFX::inputEvent& event, bool& handled) {
     // try to parse the event into a simulatorStartEvent
