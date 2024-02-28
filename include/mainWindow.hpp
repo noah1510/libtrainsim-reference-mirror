@@ -3,6 +3,8 @@
 #include "simulator.hpp"
 #include "trackSelectionWidget.hpp"
 
+#define OUTPUT_WINDOW_CLASS libtrainsim::Video::outputWindow_PictureLibav
+
 class mainWindow :public Gtk::ApplicationWindow, public SimpleGFX::tracked_eventHandle{
   private:
     std::shared_ptr<libtrainsim::core::simulatorConfiguration> conf;
@@ -10,7 +12,7 @@ class mainWindow :public Gtk::ApplicationWindow, public SimpleGFX::tracked_event
     std::shared_ptr<libtrainsim::control::input_handler> input;
 
     std::unique_ptr<trackSelectionWidget> trackSelection = nullptr;
-    std::unique_ptr<simulator> sim = nullptr;
+    std::unique_ptr<simulator<OUTPUT_WINDOW_CLASS>> sim = nullptr;
 
     std::shared_ptr<SimpleGFX::SimpleGL::appLauncher> mainAppLauncher;
   public:

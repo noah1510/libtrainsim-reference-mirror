@@ -67,7 +67,7 @@ void mainWindow::operator()(const SimpleGFX::inputEvent& event, bool& handled) {
                 return;
             }
             *conf->getLogger() << SimpleGFX::loggingLevel::debug << "Creating the simulator";
-            sim = std::make_unique<simulator>(conf, input, mainAppLauncher);
+            sim = std::make_unique<simulator<OUTPUT_WINDOW_CLASS>>(conf, input, mainAppLauncher);
             // trackSelection->hide();
         });
 

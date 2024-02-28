@@ -63,10 +63,11 @@ class mainApp : public SimpleGFX::SimpleGL::appLauncher {
 int main(int argc, char* argv[]) {
 
 #ifdef GL_LINUX_DEBUG
-    //setenv("MESA_DEBUG", "context,incomplete_tex,incomplete_fbo", 1);
+    //setenv("MESA_DEBUG", "flush,context,incomplete_tex,incomplete_fbo", 1);
     //setenv("LIBGL_DEBUG", "verbose", 1);
     //setenv("RADV_DEBUG", "img,info,shaders", 1);
     //setenv("AMD_DEBUG", "info", 1);
+    //setenv("ZINK_DEBUG", "optimal_keys,validation,sync,mem", 1);
     setenv("mesa_glthread", "true", 1);
     setenv("GST_DEBUG", "2", 1);
     // setenv("GDK_BACKEND", "x11", 1);
