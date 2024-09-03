@@ -17,6 +17,7 @@
 
 // class simulatorConfigMenu;
 
+#include "unit_system.hpp"
 class mainWindow;
 
 template<class OUTPUT_WINDOW_CLASS>
@@ -35,7 +36,7 @@ class simulator {
 
     OUTPUT_WINDOW_CLASS* video;
 
-    libtrainsim::extras::statusDisplay*                                   statusWindow;
+    libtrainsim::extras::statusDisplay*                                   statusOverlay;
     // std::unique_ptr<libtrainsim::extras::snowFx> snow;
 
     bool enableSnow    = false;
@@ -81,20 +82,22 @@ class simulator {
 
 
         // load the status display
-        /*
+       
         try{
-            statusWindow = Gtk::make_managed<libtrainsim::extras::statusDisplay>();
-            simulatorGroup->add_window(*statusWindow);
+            statusOverlay = Gtk::make_managed<libtrainsim::extras::statusDisplay>(mainApp);
+            
 
-            statusWindow->registerWithEventManager(settings->getInputManager().get(), 0);
-            input->getKeyboardPoller()->addWindow(statusWindow);
+            settings->getInputManager()->registerHandler(*statusOverlay);
+            input->getKeyboardPoller()->addWidget(*statusOverlay);
 
-            statusWindow->changeBeginPosition(track.firstLocation());
-            statusWindow->changeEndPosition(track.lastLocation());
+            statusOverlay->changeBeginPosition(track.firstLocation());
+            statusOverlay->changeEndPosition(track.lastLocation());
+            
+            video->getOverlayContainer().add_overlay(*statusOverlay);
         }catch(...){
             std::throw_with_nested(std::runtime_error("Could not create status window"));
         }
-        */
+        
 
         // display all windows in the group
         for (auto win : simulatorGroup->list_windows()) {
@@ -204,26 +207,28 @@ class simulator {
         //}
 
         // display statistics (speed, location, frametime, etc.)
-        // auto next_time = SimpleGFX::chrono::now();
-        // statusWindow->appendFrametime(unit_cast(next_time-last_time));
+        static auto last_time = SimpleGFX::chrono::now();
+        auto next_time = SimpleGFX::chrono::now();
+        statusOverlay->appendFrametime(sakurajin::unit_system::unit_cast(next_time-last_time));
+        last_time = next_time;
 
         auto renderTimes = video->getNewRendertimes();
-        // if(renderTimes.has_value()){
-        //     for(auto time:renderTimes.value()){
-        //         statusWindow->appendRendertime(time);
-        //     }
-        // }
+        if(renderTimes.has_value()){
+            for(auto time:renderTimes.value()){
+                statusOverlay->appendRendertime(time);
+            }
+        }
 
-        // statusWindow->changePosition(phy->getLocation());
+        statusOverlay->changePosition(phy->getLocation());
 
-        // statusWindow->setAcceleration(phy->getAcceleration());
-        // statusWindow->setSpeedLevel(input->getSpeedAxis());
+        statusOverlay->setAcceleration(phy->getAcceleration());
+        statusOverlay->setSpeedLevel(input->getSpeedAxis());
 
-        // auto vel = phy->getVelocity();
+        auto vel = phy->getVelocity();
         // snow->updateTrainSpeed(vel);
-        // statusWindow->setVelocity(vel);
+        statusOverlay->setVelocity(vel);
 
-        // statusWindow->redrawGraphs();
+        statusOverlay->redrawGraphs();
 
         // if(input->closingFlag()){
         //     std::cout << "Esc key is pressed by user. Stoppig the video" << std::endl;
