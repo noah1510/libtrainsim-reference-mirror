@@ -55,7 +55,6 @@ void trackSelectionWidget::reCreateTrackList() {
                 conf->getInputManager()->raiseEvent(simulatorStartEvent::create(i, stopBegin, stopEnd));
             } catch (const std::exception& e) {
                 SimpleGFX::exception::printException(e);
-                app->quit();
                 return;
             }
         });
@@ -119,8 +118,13 @@ void trackSelectionWidget::reCreateTrackList() {
         }
 
         // add all buttons to the pane and show it
-        buttonPane->set_start_child(*buttonListBegin);
-        buttonPane->set_end_child(*buttonListEnd);
+        auto trackScrollL = Gtk::make_managed<Gtk::ScrolledWindow>();
+        trackScrollL->set_child(*buttonListBegin);
+        buttonPane->set_start_child(*trackScrollL);
+
+        auto trackScrollR = Gtk::make_managed<Gtk::ScrolledWindow>();
+        trackScrollR->set_child(*buttonListEnd);
+        buttonPane->set_end_child(*trackScrollR);
 
         trackStack->add(*pagePane, track.getName(), track.getName());
     }

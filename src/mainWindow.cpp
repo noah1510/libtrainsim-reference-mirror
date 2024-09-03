@@ -51,6 +51,23 @@ void mainWindow::operator()(const SimpleGFX::inputEvent& event, bool& handled) {
         // set the correct track and stop in the configuration
         conf->selectTrack(selectedTrackID);
         const auto& stops = conf->getCurrentTrack().getStations();
+
+        if (stopBegin >= stops.size()){
+            stopBegin = stops.size() - 2;
+            stopEnd = stops.size() - 1;
+        }
+
+        if (stopEnd >= stops.size()){
+            stopEnd = stops.size() - 1;
+        }
+
+        if (stopBegin > stopEnd){
+            if (stopEnd == 0){
+                stopEnd = 1;
+            }
+            stopBegin = stopEnd - 1;
+        }
+
         conf->getTrack(selectedTrackID).setLastLocation(stops[stopEnd].position());
 
         // print some debug info about the selected track
