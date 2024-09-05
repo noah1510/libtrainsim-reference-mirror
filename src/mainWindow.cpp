@@ -79,14 +79,16 @@ void mainWindow::operator()(const SimpleGFX::inputEvent& event, bool& handled) {
 
         // create the simulator and start it
         // that call has to be deffered since this function is not called on the main thread
-        mainAppLauncher->callDeffered([this]() {
-            if (sim != nullptr) {
-                return;
-            }
-            *conf->getLogger() << SimpleGFX::loggingLevel::debug << "Creating the simulator";
-            sim = std::make_unique<simulator<OUTPUT_WINDOW_CLASS>>(conf, input, mainAppLauncher);
-            // trackSelection->hide();
-        });
+        mainAppLauncher->callDeffered(
+            [this]() {
+                if (sim != nullptr) {
+                    return;
+                }
+                *conf->getLogger() << SimpleGFX::loggingLevel::debug << "Creating the simulator";
+                sim = std::make_unique<simulator<OUTPUT_WINDOW_CLASS>>(conf, input, mainAppLauncher);
+                // trackSelection->hide();
+            }, sec_getID()
+        );
 
         handled = true;
         return;
@@ -107,7 +109,7 @@ void mainWindow::operator()(const SimpleGFX::inputEvent& event, bool& handled) {
             sim = nullptr;
 
             // trackSelection->show();
-        });
+        }, sec_getID());
 
         handled = true;
         return;

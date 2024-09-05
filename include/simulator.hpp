@@ -21,7 +21,7 @@
 class mainWindow;
 
 template<class OUTPUT_WINDOW_CLASS>
-class simulator {
+class simulator : public sec_sigc::sec_trackable {
     // friend class simulatorConfigMenu;
   private:
     std::shared_ptr<libtrainsim::core::simulatorConfiguration> settings;
@@ -179,7 +179,7 @@ class simulator {
 
         // check if the simulator has to be closed
         if (video->getRenderer().getDecoder().reachedEndOfFile() || phy->reachedEnd()) {
-            mainApp->callDeffered(sigc::mem_fun(*this, &simulator::end));
+            mainApp->callDeffered([this]() { this->end(); }, sec_getID());
             return false;
         }
 
