@@ -170,7 +170,7 @@ class simulator : public sec_sigc::sec_trackable {
 
         phy->setSpeedlevel(input->getSpeedAxis());
 
-        if (input->emergencyFlag()) {
+        if (input->emergencyFlag(phy->emergencyBreaking())) {
             phy->emergencyBreak();
         }
 
@@ -184,7 +184,7 @@ class simulator : public sec_sigc::sec_trackable {
         }
 
         // get the next frame that will be displayed
-        auto frame_num = track.data().getFrame(loc);
+        auto frame_num = track.getFrame(loc);
 
         // if there is already a frame that is being rendered
         // then this call will buffer the furthest frame to be rendered
