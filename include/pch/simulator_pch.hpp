@@ -1,5 +1,5 @@
-// make sure simplegl is loaded
-#include "simplegl.hpp"
+// make sure simplegtk is loaded
+#include "simplegfx.hpp"
 
 // core libtrainsim components
 #include "control.hpp"

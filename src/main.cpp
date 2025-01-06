@@ -1,7 +1,8 @@
 #include "mainWindow.hpp"
 
 using namespace std::literals;
-using namespace SimpleGFX::SimpleGL;
+using namespace SimpleGFX::core;
+using namespace SimpleGFX::gl;
 using namespace libtrainsim::Video;
 using namespace libtrainsim::core;
 
@@ -10,11 +11,11 @@ class mainApp;
 const std::string               appName     = "thm.bahn_simulator.reference";
 static std::shared_ptr<mainApp> appInstance = nullptr;
 
-class mainApp : public SimpleGFX::SimpleGL::appLauncher {
+class mainApp : public SimpleGFX::ui::appLauncher {
   private:
     std::shared_ptr<libtrainsim::core::simulatorConfiguration> conf;
     std::unique_ptr<mainWindow>                                menu;
-    std::shared_ptr<SimpleGFX::SimpleGL::loggerWindow>         loggerWin;
+    std::shared_ptr<SimpleGFX::ui::loggerWindow>               loggerWin;
 
     void load() override {
         try {
@@ -63,11 +64,11 @@ class mainApp : public SimpleGFX::SimpleGL::appLauncher {
 int main(int argc, char* argv[]) {
 
 #ifdef GL_LINUX_DEBUG
-    //setenv("MESA_DEBUG", "flush,context,incomplete_tex,incomplete_fbo", 1);
-    //setenv("LIBGL_DEBUG", "verbose", 1);
-    //setenv("RADV_DEBUG", "img,info,shaders", 1);
-    //setenv("AMD_DEBUG", "info", 1);
-    //setenv("ZINK_DEBUG", "optimal_keys,validation,sync,mem", 1);
+    // setenv("MESA_DEBUG", "flush,context,incomplete_tex,incomplete_fbo", 1);
+    // setenv("LIBGL_DEBUG", "verbose", 1);
+    // setenv("RADV_DEBUG", "img,info,shaders", 1);
+    // setenv("AMD_DEBUG", "info", 1);
+    // setenv("ZINK_DEBUG", "optimal_keys,validation,sync,mem", 1);
     setenv("mesa_glthread", "true", 1);
     setenv("GST_DEBUG", "2", 1);
     // setenv("GDK_BACKEND", "x11", 1);
@@ -76,7 +77,7 @@ int main(int argc, char* argv[]) {
     try {
         appInstance = std::make_shared<mainApp>();
     } catch (const std::exception& e) {
-        SimpleGFX::exception::printException(e);
+        printException(e);
         return 100;
     }
 

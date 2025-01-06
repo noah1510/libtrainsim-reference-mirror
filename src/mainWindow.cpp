@@ -5,16 +5,17 @@ using namespace libtrainsim::Video;
 
 using namespace sakurajin::unit_system;
 using namespace sakurajin::unit_system::literals;
-using namespace SimpleGFX::SimpleGL;
+using namespace SimpleGFX::core;
+using namespace SimpleGFX::gl;
 using namespace std::literals;
 
 mainWindow::mainWindow(std::shared_ptr<libtrainsim::core::simulatorConfiguration> _conf,
-                       const std::shared_ptr<SimpleGFX::SimpleGL::appLauncher>&   application)
+                       const std::shared_ptr<SimpleGFX::ui::appLauncher>&         application)
     : Gtk::ApplicationWindow{application},
       conf{std::move(_conf)},
       mainAppLauncher{application} {
 
-    *conf->getLogger() << SimpleGFX::loggingLevel::debug << "Creating the main menu";
+    *conf->getLogger() << loggingLevel::debug << "Creating the main menu";
 
     input = std::make_shared<libtrainsim::control::input_handler>(conf);
     conf->getInputManager()->registerHandler(*input);
@@ -31,14 +32,14 @@ mainWindow::mainWindow(std::shared_ptr<libtrainsim::core::simulatorConfiguration
     trackSelection = std::make_unique<trackSelectionWidget>(conf, mainAppLauncher);
     set_child(*trackSelection);
 
-    *conf->getLogger() << SimpleGFX::loggingLevel::normal << "Main menu created";
+    *conf->getLogger() << loggingLevel::normal << "Main menu created";
 }
 
 mainWindow::~mainWindow() {
     sec_untrack();
 }
 
-void mainWindow::operator()(const SimpleGFX::inputEvent& event, bool& handled) {
+void mainWindow::operator()(const inputEvent& event, bool& handled) {
     // try to parse the event into a simulatorStartEvent
     auto startEvent = simulatorStartEvent::parse(event);
     if (startEvent.has_value()) {
@@ -52,17 +53,17 @@ void mainWindow::operator()(const SimpleGFX::inputEvent& event, bool& handled) {
         conf->selectTrack(selectedTrackID);
         const auto& stops = conf->getCurrentTrack().getStations();
 
-        if (stopBegin >= stops.size()){
+        if (stopBegin >= stops.size()) {
             stopBegin = stops.size() - 2;
+            stopEnd   = stops.size() - 1;
+        }
+
+        if (stopEnd >= stops.size()) {
             stopEnd = stops.size() - 1;
         }
 
-        if (stopEnd >= stops.size()){
-            stopEnd = stops.size() - 1;
-        }
-
-        if (stopBegin > stopEnd){
-            if (stopEnd == 0){
+        if (stopBegin > stopEnd) {
+            if (stopEnd == 0) {
                 stopEnd = 1;
             }
             stopBegin = stopEnd - 1;
@@ -71,10 +72,10 @@ void mainWindow::operator()(const SimpleGFX::inputEvent& event, bool& handled) {
         conf->getTrack(selectedTrackID).setLastLocation(stops[stopEnd].position());
 
         // print some debug info about the selected track
-        *conf->getLogger() << SimpleGFX::loggingLevel::detail << "Setting start location: " << stopBegin << " to "
+        *conf->getLogger() << loggingLevel::detail << "Setting start location: " << stopBegin << " to "
                            << conf->getCurrentTrack().getStations()[stopBegin].name();
         conf->getTrack(selectedTrackID).setFirstLocation(stops[stopBegin].position());
-        *conf->getLogger() << SimpleGFX::loggingLevel::detail << "Setting end location: " << stopEnd << " to "
+        *conf->getLogger() << loggingLevel::detail << "Setting end location: " << stopEnd << " to "
                            << conf->getCurrentTrack().getStations()[stopEnd].name();
 
         // create the simulator and start it
@@ -84,11 +85,11 @@ void mainWindow::operator()(const SimpleGFX::inputEvent& event, bool& handled) {
                 if (sim != nullptr) {
                     return;
                 }
-                *conf->getLogger() << SimpleGFX::loggingLevel::debug << "Creating the simulator";
+                *conf->getLogger() << loggingLevel::debug << "Creating the simulator";
                 sim = std::make_unique<simulator<OUTPUT_WINDOW_CLASS>>(conf, input, mainAppLauncher);
                 // trackSelection->hide();
-            }, sec_getID()
-        );
+            },
+            sec_getID());
 
         handled = true;
         return;
@@ -97,19 +98,21 @@ void mainWindow::operator()(const SimpleGFX::inputEvent& event, bool& handled) {
     // try to parse the event into a simulatorStopEvent
     auto stopEvent = simulatorStopEvent::parse(event);
     if (stopEvent.has_value()) {
-        mainAppLauncher->callDeffered([this]() {
-            if (sim == nullptr) {
-                return;
-            }
-            // if the event is a simulatorStopEvent, stop the simulator
-            // and return true to indicate that the event was handled
-            *conf->getLogger() << SimpleGFX::loggingLevel::normal << "Stopping the simulator";
+        mainAppLauncher->callDeffered(
+            [this]() {
+                if (sim == nullptr) {
+                    return;
+                }
+                // if the event is a simulatorStopEvent, stop the simulator
+                // and return true to indicate that the event was handled
+                *conf->getLogger() << loggingLevel::normal << "Stopping the simulator";
 
-            sim.reset();
-            sim = nullptr;
+                sim.reset();
+                sim = nullptr;
 
-            // trackSelection->show();
-        }, sec_getID());
+                // trackSelection->show();
+            },
+            sec_getID());
 
         handled = true;
         return;
@@ -121,7 +124,7 @@ void mainWindow::operator()(const SimpleGFX::inputEvent& event, bool& handled) {
 }
 
 bool mainWindow::on_close_request() {
-    *conf->getLogger() << SimpleGFX::loggingLevel::normal << "closing main menu";
+    *conf->getLogger() << loggingLevel::normal << "closing main menu";
 
     if (sim != nullptr) {
         sim.reset();

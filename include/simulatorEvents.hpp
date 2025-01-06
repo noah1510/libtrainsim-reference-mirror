@@ -18,10 +18,10 @@ class simulatorStartEvent {
      * @param _stopEndID  The index of the last stop to start the simulator on.
      */
     [[maybe_unused]]
-    static SimpleGFX::inputEvent create(size_t _trackIndex, size_t _stopBeginIndex, size_t _stopEndIndex){
+    static SimpleGFX::core::inputEvent create(size_t _trackIndex, size_t _stopBeginIndex, size_t _stopEndIndex) {
         std::stringstream ss;
         ss << _trackIndex << ";" << _stopBeginIndex << ";" << _stopEndIndex;
-        return SimpleGFX::inputEvent{ss.str(), "simulatorStartEvent"};
+        return SimpleGFX::core::inputEvent{ss.str(), "simulatorStartEvent"};
     };
 
     /**
@@ -31,12 +31,12 @@ class simulatorStartEvent {
      * @param event The inputEvent to convert.
      */
     [[maybe_unused]]
-    static std::optional<simulatorStartEvent> parse(const SimpleGFX::inputEvent& event){
+    static std::optional<simulatorStartEvent> parse(const SimpleGFX::core::inputEvent& event) {
         if (event.originName != "simulatorStartEvent") {
             return {};
         }
 
-        auto split = SimpleGFX::string::splitString(event.name, ';');
+        auto split = SimpleGFX::core::splitString(event.name, ';');
         if (split.size() != 3) {
             return {};
         }
@@ -63,8 +63,8 @@ class simulatorStopEvent {
      * @param _stopEndID  The index of the last stop to start the simulator on.
      */
     [[maybe_unused]]
-    static SimpleGFX::inputEvent create(){
-        return SimpleGFX::inputEvent{"simulatorStopEvent", "simulatorStopEvent"};
+    static SimpleGFX::core::inputEvent create() {
+        return SimpleGFX::core::inputEvent{"simulatorStopEvent", "simulatorStopEvent"};
     };
 
     /**
@@ -74,7 +74,7 @@ class simulatorStopEvent {
      * @param event The inputEvent to convert.
      */
     [[maybe_unused]]
-    static std::optional<simulatorStopEvent> parse(const SimpleGFX::inputEvent& event){
+    static std::optional<simulatorStopEvent> parse(const SimpleGFX::core::inputEvent& event) {
         if (event.originName != "simulatorStopEvent") {
             return {};
         }

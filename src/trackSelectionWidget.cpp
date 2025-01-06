@@ -5,19 +5,21 @@ using namespace libtrainsim::Video;
 
 using namespace sakurajin::unit_system;
 using namespace sakurajin::unit_system::literals;
-using namespace SimpleGFX::SimpleGL;
+using namespace SimpleGFX::core;
+using namespace SimpleGFX::gl;
 using namespace std::literals;
 
-trackSelectionWidget::trackSelectionWidget(std::shared_ptr<libtrainsim::core::simulatorConfiguration> _conf, const Glib::RefPtr<Gtk::Application>& application)
+trackSelectionWidget::trackSelectionWidget(std::shared_ptr<libtrainsim::core::simulatorConfiguration> _conf,
+                                           const Glib::RefPtr<Gtk::Application>&                      application)
     : Gtk::Frame{},
       conf{std::move(_conf)},
       app{application} {
 
-    *conf->getLogger() << SimpleGFX::loggingLevel::debug << "Creating the track selection menu";
+    *conf->getLogger() << loggingLevel::debug << "Creating the track selection menu";
 
     reCreateTrackList();
 
-    *conf->getLogger() << SimpleGFX::loggingLevel::normal << "track selection menu created";
+    *conf->getLogger() << loggingLevel::normal << "track selection menu created";
 }
 
 void trackSelectionWidget::reCreateTrackList() {
@@ -45,16 +47,16 @@ void trackSelectionWidget::reCreateTrackList() {
         // create the launch button for this track
         auto startButton = Gtk::make_managed<Gtk::Button>("Start Simulator");
         startButton->signal_clicked().connect([this, i]() {
-            *conf->getLogger() << SimpleGFX::loggingLevel::normal << "Start button pressed";
+            *conf->getLogger() << loggingLevel::normal << "Start button pressed";
             try {
                 app->mark_busy();
-                *conf->getLogger() << SimpleGFX::loggingLevel::debug << "Waiting for track to load";
+                *conf->getLogger() << loggingLevel::debug << "Waiting for track to load";
                 finishTrackLoad();
                 app->unmark_busy();
 
                 conf->getInputManager()->raiseEvent(simulatorStartEvent::create(i, stopBegin, stopEnd));
             } catch (const std::exception& e) {
-                SimpleGFX::exception::printException(e);
+                printException(e);
                 return;
             }
         });
@@ -135,7 +137,7 @@ trackSelectionWidget::~trackSelectionWidget() {
 }
 
 void trackSelectionWidget::on_show() {
-    *conf->getLogger() << SimpleGFX::loggingLevel::debug << "Showing main menu";
+    *conf->getLogger() << loggingLevel::debug << "Showing main menu";
     Gtk::Frame::on_show();
     // reCreateTrackList();
 }
@@ -150,4 +152,3 @@ void trackSelectionWidget::finishTrackLoad() {
     }
     asyncTrackLoads.clear();
 }
-

@@ -20,13 +20,13 @@
 #include "unit_system.hpp"
 class mainWindow;
 
-template<class OUTPUT_WINDOW_CLASS>
+template <class OUTPUT_WINDOW_CLASS>
 class simulator : public sec_sigc::sec_trackable {
     // friend class simulatorConfigMenu;
   private:
     std::shared_ptr<libtrainsim::core::simulatorConfiguration> settings;
     std::shared_ptr<libtrainsim::control::input_handler>       input;
-    std::shared_ptr<SimpleGFX::SimpleGL::appLauncher>          mainApp;
+    std::shared_ptr<SimpleGFX::ui::appLauncher>                mainApp;
     const libtrainsim::core::Track&                            track;
     Glib::RefPtr<Gtk::WindowGroup>                             simulatorGroup;
 
@@ -36,7 +36,7 @@ class simulator : public sec_sigc::sec_trackable {
 
     OUTPUT_WINDOW_CLASS* video;
 
-    libtrainsim::extras::statusDisplay*                                   statusOverlay;
+    libtrainsim::extras::statusDisplay* statusOverlay;
     // std::unique_ptr<libtrainsim::extras::snowFx> snow;
 
     bool enableSnow    = false;
@@ -45,7 +45,8 @@ class simulator : public sec_sigc::sec_trackable {
   public:
     simulator(std::shared_ptr<libtrainsim::core::simulatorConfiguration> _settings,
               std::shared_ptr<libtrainsim::control::input_handler>       _input,
-              std::shared_ptr<SimpleGFX::SimpleGL::appLauncher>          _mainApp): settings{std::move(_settings)},
+              std::shared_ptr<SimpleGFX::ui::appLauncher>                _mainApp)
+        : settings{std::move(_settings)},
           input{std::move(_input)},
           mainApp{std::move(_mainApp)},
           track{settings->getCurrentTrack()} {
@@ -82,22 +83,22 @@ class simulator : public sec_sigc::sec_trackable {
 
 
         // load the status display
-       
-        try{
+
+        try {
             statusOverlay = Gtk::make_managed<libtrainsim::extras::statusDisplay>(mainApp);
-            
+
 
             settings->getInputManager()->registerHandler(*statusOverlay);
             input->getKeyboardPoller()->addWidget(*statusOverlay);
 
             statusOverlay->changeBeginPosition(track.firstLocation());
             statusOverlay->changeEndPosition(track.lastLocation());
-            
+
             video->getOverlayContainer().add_overlay(*statusOverlay);
-        }catch(...){
+        } catch (...) {
             std::throw_with_nested(std::runtime_error("Could not create status window"));
         }
-        
+
 
         // display all windows in the group
         for (auto win : simulatorGroup->list_windows()) {
@@ -135,12 +136,12 @@ class simulator : public sec_sigc::sec_trackable {
         // add the settings page after everything else has been fully added
         // imguiHandler::addSettingsTab(std::make_shared<simulatorConfigMenu>(*this));
     }
-    ~simulator(){end();};
-    bool hasErrored(){return hasError;}
+    ~simulator() { end(); };
+    bool hasErrored() { return hasError; }
 
-    void end(){
+    void end() {
         auto coreLogger = settings->getLogger();
-        *coreLogger << SimpleGFX::loggingLevel::debug << "Closing simulator";
+        *coreLogger << SimpleGFX::core::loggingLevel::debug << "Closing simulator";
 
         if (hasError) {
             return;
@@ -154,16 +155,16 @@ class simulator : public sec_sigc::sec_trackable {
 
         input->resetFlags();
 
-        *coreLogger << SimpleGFX::loggingLevel::debug << "destroying physics";
+        *coreLogger << SimpleGFX::core::loggingLevel::debug << "destroying physics";
         phy.reset();
 
         // std::cout << "   destroying snowfx" << std::endl;
         // snow.reset();
 
-        *coreLogger << SimpleGFX::loggingLevel::normal << "simulator has exited";
+        *coreLogger << SimpleGFX::core::loggingLevel::normal << "simulator has exited";
     }
 
-    bool updatePhysics(){
+    bool updatePhysics() {
         if (hasError) {
             return false;
         };
@@ -193,7 +194,7 @@ class simulator : public sec_sigc::sec_trackable {
         return true;
     }
 
-    bool update(){
+    bool update() {
         if (hasError) {
             return false;
         };
@@ -207,14 +208,14 @@ class simulator : public sec_sigc::sec_trackable {
         //}
 
         // display statistics (speed, location, frametime, etc.)
-        static auto last_time = SimpleGFX::chrono::now();
-        auto next_time = SimpleGFX::chrono::now();
-        statusOverlay->appendFrametime(sakurajin::unit_system::unit_cast(next_time-last_time));
+        static auto last_time = SimpleGFX::core::now();
+        auto        next_time = SimpleGFX::core::now();
+        statusOverlay->appendFrametime(sakurajin::unit_system::unit_cast(next_time - last_time));
         last_time = next_time;
 
         auto renderTimes = video->getNewRendertimes();
-        if(renderTimes.has_value()){
-            for(auto time:renderTimes.value()){
+        if (renderTimes.has_value()) {
+            for (auto time : renderTimes.value()) {
                 statusOverlay->appendRendertime(time);
             }
         }
@@ -228,7 +229,7 @@ class simulator : public sec_sigc::sec_trackable {
         // snow->updateTrainSpeed(vel);
         statusOverlay->setVelocity(vel);
 
-        statusOverlay->redrawGraphs();
+        // statusOverlay->redrawGraphs();
 
         // if(input->closingFlag()){
         //     std::cout << "Esc key is pressed by user. Stoppig the video" << std::endl;
